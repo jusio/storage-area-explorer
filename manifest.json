@@ -1,0 +1,13 @@
+{
+    "name": "Storage Area Explorer",
+    "version": "0.1",
+    "description": "Simple editor for Storage Area of Chrome Packaged Apps",
+    "devtools_page": "html/devtools.html",
+    "background": {
+        "persistent": false,
+        "scripts": ["js/background.js"]
+    }, "permissions": ["tabs"],
+    "manifest_version": 2
+
+
+}

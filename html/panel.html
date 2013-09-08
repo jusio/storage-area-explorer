@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html ng-csp ng-app="storageExplorer">
+<head>
+    <title></title>
+    <!--<script src="../js/panel.js"></script>-->
+    <link rel="stylesheet" href="../css/style.css">
+    <script src="../lib/angular.js"></script>
+    <script src="../js/app.js"></script>
+    <script src="../js/controllers.js"></script>
+    <script src="../js/services.js"></script>
+    <script src="../js/directives.js"></script>
+</head>
+<body>
+
+<div ng-controller="StorageCtrl" class="main">
+    <div class="header">
+        <div class="storageType" ng-show="currentType == 'local'"> Local Storage Area
+            <button ng-click="currentType = 'sync'">Switch to Sync</button>
+        </div>
+
+        <div class="storageType" ng-show="currentType == 'sync'">
+            Sync Storage Area
+            <button ng-click="currentType = 'local'">Switch to Local</button>
+        </div>
+
+        <div class="usage">{{bytesInUse}} bytes of {{meta.QUOTA_BYTES}}
+            <div ng-show="currentType == 'sync'">{{itemCount}} items of {{meta.MAX_ITEMS}} used</div>
+        </div>
+    </div>
+    <div ng-show="mode == 'list'" class="list">
+        <table ng-show="itemCount > 0">
+            <thead>
+            <tr>
+                <th style="width: 20em">
+                    Key
+                </th>
+                <th style="width:100em">
+                    Size
+                </th>
+                <th style="width:100%">Value</th>
+                <th style="width:100px"></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="(name, value) in results">
+                <td>"{{name}}"</td>
+                <td style="white-space: nowrap">
+                    {{sizeMap[name]}} bytes
+                    <span ng-show="currentType == 'sync'"> of {{meta.QUOTA_BYTES_PER_ITEM}}</span>
+                </td>
+                <td class="displayedValue">
+
+                    <entry-value class="displayedValue" value="value"/>
+                </td>
+                <td style="white-space: nowrap">
+                    <button ng-click="edit(name,value)">Edit</button>
+                    <button ng-click="delete(name)">Delete</button>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div ng-show="itemCount == 0">
+            No items in storage
+        </div>
+        <button ng-click="add()">Add Value</button>
+        <button ng-click="clear()" ng-show="itemCount > 0">Clear</button>
+    </div>
+
+    <div ng-show="mode == 'edit' || mode == 'add'" class="editPanel">
+        <label for="key">Name of key (required)</label> <input id="key" class="key" type="text" ng-model="key">
+        <label for="value">Value (use JSON format)  <span class="error" ng-show="validation">Syntax Error: {{validation}}</span></label>
+
+        <textarea id="value" class="value" ng-model="value">
+
+        </textarea>
+
+        <div class="controls">
+            <button ng-click="save()">Save</button>
+            <button ng-click="cancel()">Cancel</button>
+        </div>
+    </div>
+    <div class="debugger">
+        <div id="display"></div>
+    </div>
+</div>
+
+
+</body>
+</html>

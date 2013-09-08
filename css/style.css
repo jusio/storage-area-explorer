@@ -1,0 +1,57 @@
+.debugger {
+    display: none;
+}
+
+.value {
+    display: block;
+    -webkit-box-flex: 1;
+}
+
+.key {
+    display: block;
+    width: 100%;
+}
+
+
+.editPanel {
+    display: -webkit-box;
+    -webkit-box-flex: 1;
+    -webkit-box-orient:vertical;
+}
+
+.main {
+    position: absolute;
+    top:0;
+    left:0;
+    bottom: 0;
+    right: 0;
+    padding: 10px;
+    display: -webkit-box;
+    -webkit-box-orient:vertical;
+}
+body {
+    margin: 0;
+    padding: 0;
+    font-size: 10pt;
+}
+
+textarea {
+    resize: none;
+}
+table {
+    width: 100%;
+
+}
+th {
+    text-align: left;
+}
+.displayedValue {
+    text-overflow: ellipsis;
+    width: 20px;
+    overflow: hidden;
+}
+
+.error {
+    color:red;
+}
+
