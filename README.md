@@ -8,6 +8,8 @@ This extension is not yet deployed to the Chrome Web Store since I don't have a 
 
 So to use it you need to checkout and manually install this extension.
 
+Screenshots
 
-
+![General view](https://raw.github.com/jusio/storage-area-explorer/master/screenshots/general-view.png)
+![Editing](https://raw.github.com/jusio/storage-area-explorer/master/screenshots/editing.png)
 
