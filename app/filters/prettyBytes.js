@@ -12,9 +12,6 @@ angular.module('storageExplorer').filter("prettyBytes", function () {
         if (input < mbSize) {
              return (input / kbSize).toFixed(2) + " kb";
         }
-
         return (input / mbSize).toFixed(2) + " mb";
-
-
     };
 });
