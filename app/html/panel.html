@@ -3,11 +3,12 @@
 <head>
     <title></title>
     <link rel="stylesheet" href="../css/style.css">
-
+    <script src="../components/jquery/jquery.js"></script>
     <script src="../components/angular/angular.js"></script>
     <script src="../app.js"></script>
     <script src="../services/prettyJson.js"></script>
     <script src="../services/storage.js"></script>
+    <script src="../services/appContext.js"></script>
     <script src="../filters/prettyBytes.js"></script>
     <script src="../controllers.js"></script>
     <script src="../directives/entryValue.js"></script>
@@ -27,7 +28,7 @@
             <button ng-click="currentType = 'local'">Switch to Local</button>
         </div>
 
-        <div class="usage">{{bytesInUse | prettyBytes}}  of {{meta.QUOTA_BYTES | prettyBytes}}
+        <div class="usage">{{bytesInUse | prettyBytes}} of {{meta.QUOTA_BYTES | prettyBytes}}
             <div ng-show="currentType == 'sync'">{{itemCount}} items of {{meta.MAX_ITEMS}} used</div>
         </div>
     </div>
@@ -47,7 +48,7 @@
             </thead>
             <tbody>
             <tr ng-repeat="(name, value) in results">
-                <td>"{{name}}"</td>
+                <td class="valueKey">"{{name}}"</td>
                 <td style="white-space: nowrap">
                     {{sizeMap[name] | prettyBytes}}
                     <span ng-show="currentType == 'sync'"> of {{meta.QUOTA_BYTES_PER_ITEM | prettyBytes}}</span>
@@ -68,6 +69,7 @@
         </div>
         <button ng-click="add()">Add Value</button>
         <button ng-click="clear()" ng-show="itemCount > 0">Clear</button>
+        <button ng-click="export()">Export</button>
     </div>
 
     <div ng-show="mode == 'edit' || mode == 'add'" class="editPanel">
@@ -84,6 +86,11 @@
             <button ng-click="cancel()">Cancel</button>
         </div>
     </div>
+    <div ng-show="mode == 'export'" class="exportPanel">
+        {{downloadLink}} - {{exportName}}
+        <a  ng-href="{{downloadLink}}" donwload="file.json" target="_blank">Download</a>
+    </div>
+
     <div class="debugger">
         <div id="display"></div>
     </div>

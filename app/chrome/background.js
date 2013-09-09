@@ -5,7 +5,13 @@
         console.log("connected bg", port);
         port.onMessage.addListener(function (message) {
             console.log("received message");
-            chrome.runtime.sendMessage(message.target, message);
+            if (message.target) {
+                chrome.runtime.sendMessage(message.target, message);
+            } else if (message.appId) {
+                chrome.management.get(message.appId, function (result) {
+                    port.postMessage(result);
+                });
+            }
         });
         port.onDisconnect.addListener(function () {
             var index = ports.indexOf(port);

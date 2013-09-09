@@ -1,5 +1,5 @@
-angular.module("storageExplorer").controller("StorageCtrl", function ($scope, storage, prettyJson) {
-    dummyLog("Initializing controller")
+angular.module("storageExplorer").controller("StorageCtrl", function ($scope, storage, prettyJson, appContext) {
+    dummyLog("Initializing controller");
     $scope.sizeMap = {};
     $scope.mode = 'list';
     $scope.currentType = 'local';
@@ -42,6 +42,28 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, st
         storage[$scope.currentType].clear();
     };
 
+    $scope.export = function () {
+        storage[$scope.currentType].get(function (items) {
+            appContext().then(function (info) {
+                var blob = new Blob([prettyJson(items)], {type: 'application/json'});
+                $scope.exportName = $scope.currentType + '_export';
+                var downloadLink = URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = downloadLink;
+                a.download = $scope.currentType + '_storage_' + info.name + '.json';
+                a.click();
+                $scope.downloadLink = downloadLink;
+            });
+
+        });
+
+
+    };
+
+    $scope.import = function () {
+        $scope.mode = "import";
+    };
+
     $scope.$watch('value + key', function () {
         if ($scope.value) {
             try {
@@ -53,6 +75,7 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, st
         }
     });
 
+
     $scope.$watch('currentType', function () {
         storage[$scope.currentType].get(function (results) {
             $scope.meta = storage[$scope.currentType].getMeta();
@@ -60,7 +83,6 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, st
             $scope.results = results;
             refreshStats();
         });
-
     });
 
     function refreshStats() {
