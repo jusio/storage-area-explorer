@@ -55,3 +55,18 @@ th {
     color:red;
 }
 
+.valueKey {
+    color:black;
+}
+
+.string {
+    color:green;
+}
+.quote {
+    color:green;
+}
+
+.number {
+    color:maroon;
+}
+
