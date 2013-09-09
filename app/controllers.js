@@ -1,32 +1,23 @@
-angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $q, storage) {
+angular.module("storageExplorer").controller("StorageCtrl", function ($scope, storage, prettyJson) {
+    dummyLog("Initializing controller")
     $scope.sizeMap = {};
-    $scope.mode = 'list'; //other mods add, edit
-    $scope.test = "Working";
+    $scope.mode = 'list';
     $scope.currentType = 'local';
 
     $scope.delete = function (key) {
-        $q.when(storage).then(function (storageInstance) {
-            storage = storageInstance;
-            var storageArea = storage[$scope.currentType];
-            storageArea.remove(key);
-        });
+        storage[$scope.currentType].remove(key);
     };
     $scope.add = function () {
         $scope.mode = 'add';
         $scope.newValue = '';
     };
     $scope.save = function () {
-        $q.when(storage).then(function (storageInstance) {
-            storage = storageInstance;
-            var storageArea = storage[$scope.currentType];
-            var obj = {};
-            obj[$scope.key] = angular.fromJson($scope.value);
-            storageArea.set(obj, function () {
-                $scope.mode = 'list';
-                $scope.key = null;
-                $scope.value = null;
-            });
-
+        var obj = {};
+        obj[$scope.key] = angular.fromJson($scope.value);
+        storage[$scope.currentType].set(obj, function () {
+            $scope.mode = 'list';
+            $scope.key = null;
+            $scope.value = null;
         });
     };
     $scope.cancel = function () {
@@ -40,69 +31,7 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $q
         if (!angular.isObject(value)) {
             $scope.value = angular.toJson(value);
         } else {
-            var json = [];
-
-            function prettyJson(val, depth) {
-                if (angular.isArray(val)) {
-                    json.push("[");
-
-                    angular.forEach(val, function (item) {
-                        if (!angular.isArray(item) && angular.isObject(item)) {
-                            json.push("\n");
-                            tabs(depth + 2);
-                        }
-                        prettyJson(item, depth + 2);
-                        json.push(", ");
-                    });
-                    if (val.length > 0) {
-                        json.pop();
-                    }
-                    json.push("]");
-                    return;
-                }
-
-                if (angular.isObject(val)) {
-                    json.push("{\n");
-                    var empty = true;
-                    angular.forEach(val, function (value, key) {
-                        if (key === '$$hashKey') {
-                            return;
-                        }
-                        empty = false;
-                        tabs(depth + 1);
-                        json.push('"' + key + '" : ');
-                        prettyJson(value, depth + 1);
-                        json.push(",\n");
-                    });
-                    json.pop();
-                    if (!empty) {
-                        json.push("\n");
-                        tabs(depth);
-                    } else {
-                        json.push("{");
-                    }
-                    json.push("}");
-                    return;
-                }
-                if (angular.isString(val)) {
-                    json.push('"' + val + '"');
-                    return;
-                }
-
-                json.push(val);
-            }
-
-            function tabs(depth) {
-                while (depth > 0) {
-                    json.push("\t");
-                    depth--;
-                }
-
-            }
-
-            prettyJson(value, 0);
-            $scope.value = json.join('');
-
+            $scope.value = prettyJson(value);
         }
 
     };
@@ -110,10 +39,7 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $q
         if (!window.confirm("Are you sure")) {
             return;
         }
-        $q.when(storage).then(function (storageInstance) {
-            var storageArea = storage[$scope.currentType];
-            storageArea.clear();
-        });
+        storage[$scope.currentType].clear();
     };
 
     $scope.$watch('value + key', function () {
@@ -128,19 +54,11 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $q
     });
 
     $scope.$watch('currentType', function () {
-        $q.when(storage).then(function (storageInstance) {
-            storage = storageInstance;
-            var storageArea = storage[$scope.currentType];
-            storageArea.get(function (results) {
-                $scope.meta = {};
-                $scope.results = results;
-                angular.forEach(storageArea, function (val, key) {
-                    if (angular.isNumber(val)) {
-                        $scope.meta[key] = val;
-                    }
-                });
-                refreshStats();
-            });
+        storage[$scope.currentType].get(function (results) {
+            $scope.meta = storage[$scope.currentType].getMeta();
+            dummyLog("Meta is " + $scope.meta);
+            $scope.results = results;
+            refreshStats();
         });
 
     });
@@ -150,12 +68,9 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $q
         $scope.bytesInUse = 0;
         angular.forEach($scope.results, function (val, key) {
             $scope.itemCount++;
-            $q.when(storage).then(function (storageInstance) {
-                var area = storageInstance[$scope.currentType];
-                area.getBytesInUse(key, function (amount) {
-                    $scope.bytesInUse += amount;
-                    $scope.sizeMap[key] = amount;
-                });
+            storage[$scope.currentType].getBytesInUse(key, function (amount) {
+                $scope.bytesInUse += amount;
+                $scope.sizeMap[key] = amount;
             });
         });
     }

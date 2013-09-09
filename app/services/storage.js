@@ -1,9 +1,10 @@
 angular.module("storageExplorer").factory("storage", function ($q, $rootScope) {
-    var deferred = $q.defer();
+    var localDeferred = $q.defer();
+    var syncDeferred = $q.defer();
     var injectedScript = function () {
         var from = "APP_ID";
         chrome.storage.onChanged.addListener(function (changes, name) {
-            chrome.runtime.sendMessage(from,{change: true, changes: changes, type: name});
+            chrome.runtime.sendMessage(from, {change: true, changes: changes, type: name});
         });
 
         chrome.runtime.onMessageExternal.addListener(function (message, sender, response) {
@@ -25,8 +26,8 @@ angular.module("storageExplorer").factory("storage", function ($q, $rootScope) {
                     chrome.runtime.sendMessage(from, message);
                 });
                 message.meta = {};
-                for(var j in storage) {
-                    if(typeof storage[j] === 'function') {
+                for (var j in storage) {
+                    if (typeof storage[j] === 'function') {
                         continue;
                     }
                     message.meta[j] = storage[j];
@@ -40,6 +41,8 @@ angular.module("storageExplorer").factory("storage", function ($q, $rootScope) {
     function DelegatedStorageArea(port, remoteId, type) {
         var self = this;
         var methodCallbacks = {};
+        var metaDeferred = $q.defer();
+        var meta = metaDeferred.promise;
 
         function s4() {
             return Math.floor((1 + Math.random()) * 0x10000)
@@ -89,9 +92,11 @@ angular.module("storageExplorer").factory("storage", function ($q, $rootScope) {
             if (result.type != type) {
                 return;
             }
-            angular.forEach(result.meta,function(val,key){
-               self[key] = val;
-            });
+            if (metaDeferred) {
+                metaDeferred.resolve(result.meta);
+                metaDeferred = null;
+            }
+            meta = result.meta;
 
             var callback = methodCallbacks[result.id];
             if (!callback) {
@@ -110,6 +115,17 @@ angular.module("storageExplorer").factory("storage", function ($q, $rootScope) {
         ["get", "set", "remove", "clear", "getBytesInUse"].forEach(function (val) {
             self[val] = createMethodDelegate(val);
         });
+        self.getMeta = function () {
+            if (metaDeferred) {
+                var deferred = $q.defer();
+                $q.when(meta).then(function (meta) {
+                    deferred.resolve(meta);
+                });
+                return deferred.promise;
+            } else {
+                return meta;
+            }
+        }
     }
 
 
@@ -142,7 +158,10 @@ angular.module("storageExplorer").factory("storage", function ($q, $rootScope) {
                 try {
                     local = new DelegatedStorageArea(port, remoteId, "local");
                     sync = new DelegatedStorageArea(port, remoteId, "sync");
-                    deferred.resolve({local: local, sync: sync});
+                    localDeferred.resolve(local);
+                    syncDeferred.resolve(sync);
+                    returnValue.local = local;
+                    returnValue.sync = sync;
                     $rootScope.$apply();
                 } catch (e) {
                     dummyLog(e);
@@ -151,13 +170,36 @@ angular.module("storageExplorer").factory("storage", function ($q, $rootScope) {
         })
 
     });
-    return deferred.promise;
+
+
+    var storage = {
+        local: localDeferred.promise,
+        sync: syncDeferred.promise
+    };
+
+    function delegateMethod(methodName, objName, container) {
+        return function () {
+            var deferred = $q.defer();
+            var args = [];
+            for (var i = 0; i < arguments.length; i++) {
+                args.push(arguments[i]);
+            }
+            $q.when(container[objName]).then(function (obj) {
+                deferred.resolve(obj[methodName].apply(obj, args));
+            });
+            return deferred.promise;
+        }
+    }
+
+    var returnValue = {
+        sync: {},
+        local: {}
+    };
+    ["get", "set", "remove", "clear", "getBytesInUse", "getMeta"].forEach(function (val) {
+        returnValue.local[val] = delegateMethod(val, 'local', storage);
+        returnValue.sync[val] = delegateMethod(val, 'sync', storage);
+    });
+
+
+    return returnValue;
 });
-
-
-function dummyLog(message) {
-
-//    var elementById = document.getElementById("display");
-//    elementById.innerHTML += "<br>";
-//    elementById.innerText += message;
-}
