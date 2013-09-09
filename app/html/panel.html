@@ -8,6 +8,7 @@
     <script src="../app.js"></script>
     <script src="../services/prettyJson.js"></script>
     <script src="../services/storage.js"></script>
+    <script src="../filters/prettyBytes.js"></script>
     <script src="../controllers.js"></script>
     <script src="../directives.js"></script>
 
@@ -26,7 +27,7 @@
             <button ng-click="currentType = 'local'">Switch to Local</button>
         </div>
 
-        <div class="usage">{{bytesInUse}} bytes of {{meta.QUOTA_BYTES}}
+        <div class="usage">{{bytesInUse | prettyBytes}}  of {{meta.QUOTA_BYTES | prettyBytes}}
             <div ng-show="currentType == 'sync'">{{itemCount}} items of {{meta.MAX_ITEMS}} used</div>
         </div>
     </div>
@@ -48,8 +49,8 @@
             <tr ng-repeat="(name, value) in results">
                 <td>"{{name}}"</td>
                 <td style="white-space: nowrap">
-                    {{sizeMap[name]}} bytes
-                    <span ng-show="currentType == 'sync'"> of {{meta.QUOTA_BYTES_PER_ITEM}}</span>
+                    {{sizeMap[name] | prettyBytes}}
+                    <span ng-show="currentType == 'sync'"> of {{meta.QUOTA_BYTES_PER_ITEM | prettyBytes}}</span>
                 </td>
                 <td class="displayedValue">
 
