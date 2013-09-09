@@ -6,7 +6,7 @@ if (!chrome.devtools.inspectedWindow.tabId) {
             panels.create(
                 "Storage Explorer",
                 "img/angular.png",
-                "html/panel.html"
+                "/app/html/panel.html"
             );
         }
     });

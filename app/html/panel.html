@@ -2,13 +2,14 @@
 <html ng-csp ng-app="storageExplorer">
 <head>
     <title></title>
-    <!--<script src="../js/panel.js"></script>-->
     <link rel="stylesheet" href="../css/style.css">
-    <script src="../lib/angular.js"></script>
-    <script src="../js/app.js"></script>
-    <script src="../js/controllers.js"></script>
-    <script src="../js/services.js"></script>
-    <script src="../js/directives.js"></script>
+
+    <script src="../components/angular/angular.js"></script>
+    <script src="../app.js"></script>
+    <script src="../controllers.js"></script>
+    <script src="../services.js"></script>
+    <script src="../directives.js"></script>
+
 </head>
 <body>
 
@@ -68,7 +69,8 @@
 
     <div ng-show="mode == 'edit' || mode == 'add'" class="editPanel">
         <label for="key">Name of key (required)</label> <input id="key" class="key" type="text" ng-model="key">
-        <label for="value">Value (use JSON format)  <span class="error" ng-show="validation">Syntax Error: {{validation}}</span></label>
+        <label for="value">Value (use JSON format) <span class="error"
+                                                         ng-show="validation">Syntax Error: {{validation}}</span></label>
 
         <textarea id="value" class="value" ng-model="value">
 
