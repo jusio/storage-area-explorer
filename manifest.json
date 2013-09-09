@@ -5,7 +5,7 @@
     "devtools_page": "html/devtools.html",
     "background": {
         "persistent": false,
-        "scripts": ["js/background.js"]
+        "scripts": ["js/chrome/background.js"]
     }, "permissions": ["tabs"],
     "manifest_version": 2
 
