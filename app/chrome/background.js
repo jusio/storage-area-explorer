@@ -11,6 +11,8 @@
                 chrome.management.get(message.appId, function (result) {
                     port.postMessage(result);
                 });
+            } else if (message.executeAction) {
+
             }
         });
         port.onDisconnect.addListener(function () {
@@ -27,5 +29,30 @@
         }
         console.log("Message from " + sender.id + " contents ", message);
     });
+
+    chrome.runtime.onMessage.addListener(function (message, sender, response) {
+        console.log("action",message);
+        if (message.action === 'copy') {
+
+
+            area.value = message.params[0];
+            area.select();
+           document.execCommand('copy');
+            console.log("Copied " + area.value);
+            response && response();
+            area.value = '';
+            return;
+        }
+        if (message.action === 'paste') {
+            area.select();
+            document.execCommand("paste");
+            response && response(area.value);
+            area.value = '';
+            return;
+        }
+    });
+
+    var area = document.createElement("textarea");
+    document.body.appendChild(area);
 
 })();

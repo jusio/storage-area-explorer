@@ -6,7 +6,7 @@
     "background": {
         "persistent": false,
         "scripts": ["app/chrome/background.js"]
-    }, "permissions": ["management"],
+    }, "permissions": ["management","clipboardRead","clipboardWrite"], "optional_permissions": ["storage"],
     "manifest_version": 2
 
 

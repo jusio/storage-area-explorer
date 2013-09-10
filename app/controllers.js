@@ -1,5 +1,6 @@
-angular.module("storageExplorer").controller("StorageCtrl", function ($scope, storage, prettyJson, appContext) {
+angular.module("storageExplorer").controller("StorageCtrl", function ($scope, storage, prettyJson, appContext, clipboard) {
     dummyLog("Initializing controller");
+
     $scope.sizeMap = {};
     $scope.mode = 'list';
     $scope.currentType = 'local';
@@ -56,8 +57,25 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, st
             });
 
         });
+    };
 
-
+    $scope.exportClipboard = function () {
+        storage[$scope.currentType].get(function (items) {
+            var a = prettyJson(items);
+            clipboard.put(a);
+        });
+    };
+    $scope.importClipboard = function () {
+        clipboard.get().then(function (value) {
+            try {
+                var parse = JSON.parse(value);
+                storage[$scope.currentType].clear(function () {
+                    storage[$scope.currentType].set(parse);
+                });
+            } catch (e) {
+                alert("Error", e);
+            }
+        });
     };
 
     $scope.import = function () {

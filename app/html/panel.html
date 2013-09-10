@@ -3,12 +3,15 @@
 <head>
     <title></title>
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/bootstrap/css/bootstrap.css">
     <script src="../components/jquery/jquery.js"></script>
+    <script src="../css/bootstrap/js/bootstrap.js"></script>
     <script src="../components/angular/angular.js"></script>
     <script src="../app.js"></script>
     <script src="../services/prettyJson.js"></script>
     <script src="../services/storage.js"></script>
     <script src="../services/appContext.js"></script>
+    <script src="../services/clipboard.js"></script>
     <script src="../filters/prettyBytes.js"></script>
     <script src="../controllers.js"></script>
     <script src="../directives/entryValue.js"></script>
@@ -20,12 +23,12 @@
 <div ng-controller="StorageCtrl" class="main">
     <div class="header">
         <div class="storageType" ng-show="currentType == 'local'"> Local Storage Area
-            <button ng-click="currentType = 'sync'">Switch to Sync</button>
+            <button class="btn btn-default btn-xs" ng-click="currentType = 'sync'">Switch to Sync</button>
         </div>
 
         <div class="storageType" ng-show="currentType == 'sync'">
             Sync Storage Area
-            <button ng-click="currentType = 'local'">Switch to Local</button>
+            <button class="btn btn-default btn-xs" ng-click="currentType = 'local'">Switch to Local</button>
         </div>
 
         <div class="usage">{{bytesInUse | prettyBytes}} of {{meta.QUOTA_BYTES | prettyBytes}}
@@ -33,7 +36,7 @@
         </div>
     </div>
     <div ng-show="mode == 'list'" class="list">
-        <table ng-show="itemCount > 0">
+        <table ng-show="itemCount > 0" class="table table-striped table-hover">
             <thead>
             <tr>
                 <th style="width: 20em">
@@ -58,8 +61,11 @@
                     <entry-value class="displayedValue" value="value"/>
                 </td>
                 <td style="white-space: nowrap">
-                    <button ng-click="edit(name,value)">Edit</button>
-                    <button ng-click="delete(name)">Delete</button>
+
+                    <button class="btn btn-default btn-xs" ng-click="edit(name,value)"><span
+                            class="glyphicon glyphicon-edit"></span></button>
+                    <button class="btn btn-danger btn-xs" ng-click="delete(name)"><span
+                            class="glyphicon glyphicon-remove-circle"></span></button>
                 </td>
             </tr>
             </tbody>
@@ -67,9 +73,29 @@
         <div ng-show="itemCount == 0">
             No items in storage
         </div>
-        <button ng-click="add()">Add Value</button>
-        <button ng-click="clear()" ng-show="itemCount > 0">Clear</button>
-        <button ng-click="export()">Export</button>
+
+        <button class="btn btn-primary btn-sm" ng-click="add()">Add Value</button>
+        <button class="btn btn-warning btn-sm" ng-click="clear()" ng-show="itemCount > 0">Clear</button>
+        <div class="btn-group">
+            <button class="btn btn-info dropdown-toggle btn-sm" data-toggle="dropdown">Export <span
+                    class="caret"></span></button>
+            <ul class="dropdown-menu" role="menu">
+                <li><a href="#" ng-click="export()"><span class="glyphicon glyphicon-download"></span> To File</a></li>
+                <li><a href="#" ng-click="exportClipboard()"><span class="glyphicon glyphicon-export"></span> To
+                    Clipboard</a></li>
+            </ul>
+
+        </div>
+        <div class="btn-group">
+            <button type="button" class="btn btn-info dropdown-toggle btn-sm" data-toggle="dropdown">
+                Import <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li><a href="#" ng-click="import()">From File</a></li>
+                <li><a href="#" ng-click="importClipboard()">From Clipboard</a></li>
+            </ul>
+        </div>
+
     </div>
 
     <div ng-show="mode == 'edit' || mode == 'add'" class="editPanel">
@@ -82,13 +108,9 @@
         </textarea>
 
         <div class="controls">
-            <button ng-click="save()">Save</button>
-            <button ng-click="cancel()">Cancel</button>
+            <button class="btn btn-primary" ng-click="save()">Save</button>
+            <button class="btn btn-danger" ng-click="cancel()">Cancel</button>
         </div>
-    </div>
-    <div ng-show="mode == 'export'" class="exportPanel">
-        {{downloadLink}} - {{exportName}}
-        <a  ng-href="{{downloadLink}}" donwload="file.json" target="_blank">Download</a>
     </div>
 
     <div class="debugger">
