@@ -1,6 +1,6 @@
 angular.module("storageExplorer").factory("appContext", function ($q, $rootScope) {
     var appDeferred = $q.defer();
-    var appInfo = appDeferred;
+    var appInfo = appDeferred.promise;
 
 
     var port = chrome.runtime.connect();
@@ -8,6 +8,7 @@ angular.module("storageExplorer").factory("appContext", function ($q, $rootScope
     port.onMessage.addListener(function (result) {
         if (result.name) {
             appDeferred.resolve(result);
+            appDeferred = null;
             appInfo = result;
             port.disconnect();
         }
@@ -23,9 +24,11 @@ angular.module("storageExplorer").factory("appContext", function ($q, $rootScope
 
     return function () {
         var deferred = $q.defer();
-        $q.when(appInfo).then(function (result) {
-            deferred.resolve(result);
-        });
+        if(appInfo) {
+            $q.when(appInfo).then(function (result) {
+                deferred.resolve(result);
+            });
+        }
         return deferred.promise;
     }
 });
