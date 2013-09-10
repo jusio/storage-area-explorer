@@ -1,4 +1,4 @@
-# Storage Area Explorer 0.1
+# Storage Area Explorer 0.2.1
 
 
 This is a simple extension which allows to inspect [Storage Area](http://developer.chrome.com/apps/storage.html) of [Chrome Packaged Apps](http://developer.chrome.com/apps/about_apps.html)
