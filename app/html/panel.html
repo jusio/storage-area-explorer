@@ -74,9 +74,9 @@
             No items in storage
         </div>
 
-        <button class="btn btn-primary btn-sm" ng-click="add()">Add Value</button>
+        <button class="btn btn-primary btn-sm" ng-click="add()">Add Item</button>
         <button class="btn btn-warning btn-sm" ng-click="clear()" ng-show="itemCount > 0">Clear</button>
-        <div class="btn-group">
+        <div class="btn-group" ng-show="itemCount > 0">
             <button class="btn btn-info dropdown-toggle btn-sm" data-toggle="dropdown">Export <span
                     class="caret"></span></button>
             <ul class="dropdown-menu" role="menu">
@@ -94,6 +94,9 @@
                 <li><a href="#" ng-click="import()">From File</a></li>
                 <li><a href="#" ng-click="importClipboard()">From Clipboard</a></li>
             </ul>
+        </div>
+        <div ng-show="fileImport">
+            <input type="file" id="fileImport"/>
         </div>
 
     </div>

@@ -34,7 +34,6 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, st
         } else {
             $scope.value = prettyJson(value);
         }
-
     };
     $scope.clear = function () {
         if (!window.confirm("Are you sure")) {
@@ -79,7 +78,23 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, st
     };
 
     $scope.import = function () {
-        $scope.mode = "import";
+        var fileUpload = document.getElementById("fileImport");
+        fileUpload.addEventListener("change", function (a) {
+            var file = fileUpload.files[0];
+            if (!file) {
+                return;
+            }
+            var reader = new FileReader();
+            reader.onload = function () {
+                var parse = JSON.parse(reader.result);
+                storage[$scope.currentType].clear(function () {
+                    storage[$scope.currentType].set(parse);
+                });
+            };
+            reader.readAsText(file);
+        });
+        fileUpload.click();
+
     };
 
     $scope.$watch('value + key', function () {
