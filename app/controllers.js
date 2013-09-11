@@ -79,7 +79,11 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, st
                     storage[$scope.currentType].set(parse);
                 });
             } catch (e) {
-                alert("Error", e);
+                $scope.importError = {
+                    content: value,
+                    message: "Failed to parse json, error message: " + e.message,
+                    type:"Clipboard"
+                };
             }
         });
     };
@@ -93,10 +97,21 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, st
             }
             var reader = new FileReader();
             reader.onload = function () {
-                var parse = JSON.parse(reader.result);
-                storage[$scope.currentType].clear(function () {
-                    storage[$scope.currentType].set(parse);
-                });
+                try {
+                    var parse = JSON.parse(reader.result);
+                    storage[$scope.currentType].clear(function () {
+                        storage[$scope.currentType].set(parse);
+                    });
+                } catch (e) {
+                    $scope.$apply(function () {
+                        $scope.importError = {
+                            content: reader.result,
+                            file: file.name,
+                            message: "Failed to parse content , error message " + e.message,
+                            type:'File'
+                        };
+                    });
+                }
             };
             reader.readAsText(file);
         });

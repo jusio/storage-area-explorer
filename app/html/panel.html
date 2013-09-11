@@ -45,6 +45,16 @@
         </ul>
 
     </div>
+    <div class="alert alert-danger" ng-show="importError">
+        <button type="button" class="close" ng-click="importError = null">&times;</button>
+        <strong>Import <span ng-show="importError.file"> from file {{importError.file}}</span><span ng-show="!importError.file">from clipboard </span> failed</strong><br>
+        {{importError.message}}<br>
+        <strong>{{importError.type}} contents</strong>
+        <pre>
+            {{importError.content}}
+        </pre>
+
+    </div>
     <div ng-show="mode == 'list'" class="list">
         <div class="controls">
             <button class="btn btn-primary btn-sm" ng-click="add()">Add Item</button>
@@ -88,8 +98,10 @@
             <tbody>
             <tr ng-repeat="(name, value) in results">
                 <td><span class="valueKey">{{name}}</span>
-                    <div class="usage">  {{sizeMap[name] | prettyBytes}}
-                        <span ng-show="currentType == 'sync'"> / {{meta.sync.QUOTA_BYTES_PER_ITEM | prettyBytes}}</span></div>
+
+                    <div class="usage"> {{sizeMap[name] | prettyBytes}}
+                        <span ng-show="currentType == 'sync'"> / {{meta.sync.QUOTA_BYTES_PER_ITEM | prettyBytes}}</span>
+                    </div>
                 </td>
                 <td class="displayedValue">
 
