@@ -48,6 +48,9 @@ angular.module("storageExplorer").factory("prettyJson", function () {
                 json.push('"' + val + '"');
                 return;
             }
+            if(val === null) {
+                json.push('null');
+            }
 
             json.push(val);
         }
