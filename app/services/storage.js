@@ -1,4 +1,32 @@
 angular.module("storageExplorer").factory("storage", function ($q, $rootScope) {
+    if (!chrome.devtools) {
+        //no devtools context
+        //let's fake the service
+        var fakeReturn = {sync: {}, local: {}};
+
+        ["get", "set", "remove", "clear", "getBytesInUse", "getMeta"].forEach(function (method) {
+            angular.forEach(fakeReturn, function (obj) {
+                obj[method] = function () {
+                };
+                if (method === 'get') {
+                    obj[method] = function () {
+                        for (var i = 0; i < arguments.length; i++) {
+                            if (angular.isFunction(arguments[i])) {
+                                arguments[i]({
+                                    "value with very long key 1": "val1",
+                                    "val2": "val2"
+                                });
+                            }
+                        }
+                    };
+                }
+            });
+        });
+
+        return fakeReturn;
+    }
+
+
     var localDeferred = $q.defer();
     var syncDeferred = $q.defer();
     var injectedScript = function () {

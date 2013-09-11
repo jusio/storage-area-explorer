@@ -10,6 +10,7 @@
 .key {
     display: block;
     width: 100%;
+    margin-top: 10px;
 }
 
 
@@ -40,15 +41,12 @@ textarea {
 }
 table {
     width: 100%;
-
 }
 th {
     text-align: left;
 }
 .displayedValue {
-    text-overflow: ellipsis;
-    width: 20px;
-    overflow: hidden;
+    white-space: nowrap;
 }
 
 .error {
@@ -57,6 +55,7 @@ th {
 
 .valueKey {
     color:black;
+    white-space: nowrap;
 }
 
 .string {
@@ -68,5 +67,25 @@ th {
 
 .number {
     color:maroon;
+}
+
+.list {
+    display: -webkit-box;
+    -webkit-box-flex: 1;
+    -webkit-box-orient: vertical;
+    padding-left: 15px;
+}
+
+.controls .btn {
+    width: 80px;
+}
+.controls {
+    margin-top: 5px;
+}
+.header .nav li{
+    cursor: pointer;
+}
+.usage {
+    font-size: 10px;
 }
 

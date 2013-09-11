@@ -4,7 +4,14 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, st
     $scope.sizeMap = {};
     $scope.mode = 'list';
     $scope.currentType = 'local';
-
+    $scope.stats = {
+        local: {},
+        sync: {}
+    };
+    $scope.meta = {
+        sync: storage.sync.getMeta(),
+        local: storage.local.getMeta()
+    };
     $scope.delete = function (key) {
         storage[$scope.currentType].remove(key);
     };
@@ -111,8 +118,7 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, st
 
     $scope.$watch('currentType', function () {
         storage[$scope.currentType].get(function (results) {
-            $scope.meta = storage[$scope.currentType].getMeta();
-            dummyLog("Meta is " + $scope.meta);
+
             $scope.results = results;
             refreshStats();
         });
@@ -121,10 +127,17 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, st
     function refreshStats() {
         $scope.itemCount = 0;
         $scope.bytesInUse = 0;
+        angular.forEach($scope.stats, function (stats, type) {
+            storage[type].getBytesInUse(function (bytes) {
+                $scope.stats[type].bytesInUse = bytes;
+            });
+        });
+        storage.sync.get(function (obj) {
+            $scope.stats.sync.count = Object.keys(obj).length;
+        });
         angular.forEach($scope.results, function (val, key) {
             $scope.itemCount++;
             storage[$scope.currentType].getBytesInUse(key, function (amount) {
-                $scope.bytesInUse += amount;
                 $scope.sizeMap[key] = amount;
             });
         });

@@ -1,7 +1,11 @@
 angular.module("storageExplorer").factory("appContext", function ($q, $rootScope) {
     var appDeferred = $q.defer();
     var appInfo = appDeferred.promise;
-
+    if (!chrome.devtools) {
+        return function () {
+            return $q.defer().promise
+        }
+    }
 
     var port = chrome.runtime.connect();
 
@@ -11,8 +15,10 @@ angular.module("storageExplorer").factory("appContext", function ($q, $rootScope
             appDeferred = null;
             appInfo = result;
             port.disconnect();
+            $rootScope.$apply();
         }
     });
+
 
     var inspectedWindow = chrome.devtools.inspectedWindow;
     inspectedWindow.eval('chrome.runtime.id', function (id, isError) {
@@ -24,7 +30,7 @@ angular.module("storageExplorer").factory("appContext", function ($q, $rootScope
 
     return function () {
         var deferred = $q.defer();
-        if(appInfo) {
+        if (appInfo) {
             $q.when(appInfo).then(function (result) {
                 deferred.resolve(result);
             });
