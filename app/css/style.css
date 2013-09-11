@@ -56,6 +56,7 @@ th {
 .valueKey {
     color:black;
     white-space: nowrap;
+    font-weight: bold;
 }
 
 .string {

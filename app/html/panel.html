@@ -81,19 +81,15 @@
                 <th style="width: 20em">
                     Key
                 </th>
-                <th style="width:100em">
-                    Size
-                </th>
                 <th style="width:100%">Value</th>
                 <th style="width:100px"></th>
             </tr>
             </thead>
             <tbody>
             <tr ng-repeat="(name, value) in results">
-                <td class="valueKey">"{{name}}"</td>
-                <td style="white-space: nowrap">
-                    {{sizeMap[name] | prettyBytes}}
-                    <span ng-show="currentType == 'sync'"> of {{meta.sync.QUOTA_BYTES_PER_ITEM | prettyBytes}}</span>
+                <td><span class="valueKey">{{name}}</span>
+                    <div class="usage">  {{sizeMap[name] | prettyBytes}}
+                        <span ng-show="currentType == 'sync'"> / {{meta.sync.QUOTA_BYTES_PER_ITEM | prettyBytes}}</span></div>
                 </td>
                 <td class="displayedValue">
 
