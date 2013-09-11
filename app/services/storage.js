@@ -14,7 +14,17 @@ angular.module("storageExplorer").factory("storage", function ($q, $rootScope) {
                             if (angular.isFunction(arguments[i])) {
                                 arguments[i]({
                                     "value with very long key 1": "val1",
-                                    "val2": "val2"
+                                    "val2": "val2",
+                                    "objVal": {
+                                        test: {
+                                            arr: []
+                                        },
+                                        fullArr: ["asd", false, null, 1,{}],
+                                        val: 1,
+                                        va2: false,
+                                        val3: null
+                                    }
+
                                 });
                             }
                         }

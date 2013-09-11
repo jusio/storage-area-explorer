@@ -9,6 +9,8 @@ angular.module("storageExplorer").directive("entryValue", function ($compile) {
     var stringTemplate = '<span class="quote">"</span><span class="string">{{displayedValue}}</span><span class="quote">"</span>';
     var booleanTemplate = '<span class="boolean">{{displayedValue}}</span>';
     var numberTemplate = '<span class="number">{{displayedValue}}</span>';
+    var objectTemplate = '<span class="bracket">{</span><span class="object">{{displayedValue}}</span><span class="bracket">}</span>';
+    var arrayTemplate = '<span class="bracket">[</span>{{displayedValue}}<span class="bracket">]</span>';
 
     function escape(input) {
         var string = '' + input;
@@ -25,6 +27,49 @@ angular.module("storageExplorer").directive("entryValue", function ($compile) {
 
     function num(value) {
         return numberTemplate.replace('{{displayedValue}}', value)
+    }
+
+    function object(value) {
+        if (angular.isArray(value)) {
+            return array(value);
+        }
+        if (angular.isString(value)) {
+            return string(value);
+        }
+        if (angular.isNumber(value)) {
+            return num(value);
+        }
+        if (angular.isObject(value)) {
+            var template = [];
+            angular.forEach(value, function (propVal, propKey) {
+                if (propKey !== "$$hashKey") {
+                    console.log(propKey);
+                    template.push(string(propKey));
+                    template.push(" : ");
+                    template.push(object(propVal));
+                    template.push(", ");
+                }
+            });
+            template.pop();
+            return objectTemplate.replace("{{displayedValue}}", template.join(''));
+        }
+        if (value === null) {
+            return bool(null);
+        }
+        return bool(value);
+
+
+    }
+
+    function array(value) {
+
+        var template = [];
+        angular.forEach(value, function (propVal) {
+            template.push(object(propVal));
+            template.push(", ");
+        });
+        template.pop();
+        return arrayTemplate.replace("{{displayedValue}}", template.join(''));
     }
 
     function buildObjectPreview(obj) {
@@ -79,7 +124,8 @@ angular.module("storageExplorer").directive("entryValue", function ($compile) {
                 element.html(num(value));
             } else if (angular.isObject(value)) {
                 element.html('');
-                element.append(checkWidth(angular.toJson(value)));
+                var testElement = document.createElement("div");
+                element.append(object(value));
             } else if (value === null) {
                 element.html(bool('null'));
             } else {

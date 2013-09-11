@@ -55,7 +55,13 @@ th {
 }
 .displayedValue {
     white-space: nowrap;
+    font-family: monospace;
 }
+
+/*.object {*/
+    /*display: block;*/
+    /*padding-left: 2em;*/
+/*}*/
 
 .error {
     color:red;
