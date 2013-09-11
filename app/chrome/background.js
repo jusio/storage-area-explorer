@@ -7,10 +7,6 @@
             console.log("received message");
             if (message.target) {
                 chrome.runtime.sendMessage(message.target, message);
-            } else if (message.appId) {
-                chrome.management.get(message.appId, function (result) {
-                    port.postMessage(result);
-                });
             } else if (message.executeAction) {
 
             }
@@ -23,21 +19,21 @@
         });
 
     });
-    chrome.runtime.onMessageExternal.addListener(function (message, sender, response) {
-        for (var i in ports) {
-            ports[i].postMessage({from: sender.id, obj: message});
-        }
+    chrome.runtime.onMessageExternal.addListener(function (message, sender) {
+        ports.forEach(function (port) {
+            port.postMessage({from: sender.id, obj: message});
+        });
         console.log("Message from " + sender.id + " contents ", message);
     });
 
     chrome.runtime.onMessage.addListener(function (message, sender, response) {
-        console.log("action",message);
+        console.log("action", message);
         if (message.action === 'copy') {
 
 
             area.value = message.params[0];
             area.select();
-           document.execCommand('copy');
+            document.execCommand('copy');
             console.log("Copied " + area.value);
             response && response();
             area.value = '';
@@ -48,7 +44,6 @@
             document.execCommand("paste");
             response && response(area.value);
             area.value = '';
-            return;
         }
     });
 
