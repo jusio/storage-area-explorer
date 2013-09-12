@@ -14,13 +14,18 @@ module.exports = function (config) {
 
         // list of files / patterns to load in the browser
         files: [
+            'test/mocks/*.js',
             'components/jquery/jquery.js',
             'components/angular/angular.js',
+            'components/angular-mocks/angular-mocks.js',
             'app/*.js',
             'app/**/*.js',
-            'mocks/*.js',
-            'test/**/*.js'
+            'test/src/*/*.js'
         ],
+        preprocessors: {
+            'app/*.js': 'coverage',
+            'app/**/*.js': 'coverage'
+        },
 
 
         // list of files to exclude
@@ -32,8 +37,11 @@ module.exports = function (config) {
 
         // test results reporter to use
         // possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
-        reporters: ['dots'],
-
+        reporters: ['dots', 'coverage'],
+        coverageReporter: {
+            type: 'html',
+            dir: 'coverage/'
+        },
 
         // web server port
         port: 9876,

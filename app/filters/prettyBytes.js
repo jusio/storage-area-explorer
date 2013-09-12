@@ -12,16 +12,14 @@ angular.module('storageExplorer').filter("prettyBytes", function () {
         var result;
         var type;
         if (input < mbSize) {
-            result = (input / kbSize).toFixed(2);
+            result = (input / kbSize);
             type = "kb"
         } else {
-            result = (input / mbSize).toFixed(2);
+            result = (input / mbSize);
             type = "mb"
         }
 
-        if (result == +result) {
-            result = +result;
-        }
+        result = +(result.toFixed(2));
 
         return result + type;
     };
