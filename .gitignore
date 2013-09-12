@@ -2,4 +2,4 @@
 *.iml
 node_modules
 build
-app/components
+components

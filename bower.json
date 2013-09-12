@@ -1,10 +1,21 @@
 {
-    "name": "storage-area-explorer",
-    "version": "0.2.1",
-    "dependencies": {
-        "angular": "1.0.5",
-        "jquery": "2.0.3"
-    },
-    "devDependencies": {
-    }
+  "name": "storage-area-explorer",
+  "version": "0.2.1",
+  "dependencies": {
+    "angular": "1.0.5",
+    "jquery": "2.0.3"
+  },
+  "homepage": "https://github.com/jusio/storage-area-explorer",
+  "authors": [
+    "Alexey Bykov <jusioa@gmail.com>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
 }
