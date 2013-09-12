@@ -1,5 +1,5 @@
 module.exports = function (grunt) {
-
+    var path = require('path');
     // Project configuration.
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -11,21 +11,22 @@ module.exports = function (grunt) {
         },
         zip: {
             release: {
+                router: function (filepath) {
+                    var filename = path.basename(filepath);
+                    if (filename == 'panel_production.html') {
+                        return 'app/html/panel.html';
+                    }
+                    return filepath;
+                },
                 compression: 'DEFLATE',
                 src: [
-                    'app/css/styles.css',
-                    'app/css/bootstrap/css/bootstrap.css',
-                    'app/css/bootstrap/js/bootstrap.js',
-                    'app/css/bootstrap/fonts/glyphicons-halflings-regular.woff',
-                    'app/*.js',
-                    'components/jquery/jquery.js',
-                    'components/angular/angular.js',
-                    'app/chrome/*.js',
-                    'app/html/*.html',
-                    'app/services/*.js',
-                    'app/directives/*.js',
-                    'app/controllers/*.js',
-                    'app/filters/*.js',
+                    'components/bootstrap/dist/css/bootstrap.min.css',
+                    'components/bootstrap/dist/js/bootstrap.min.js',
+                    'components/bootstrap/dist/fonts/glyphicons-halflings-regular.woff',
+                    'app/**',
+                    '!app/html/panel.html',
+                    'components/jquery/jquery.min.js',
+                    'components/angular/angular.min.js',
                     'manifest.json'
                 ],
                 dest: 'build/storage-area-explorer-v<%=pkg.version%>_' + Date.now() + '.zip'
