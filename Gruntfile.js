@@ -30,8 +30,14 @@ module.exports = function (grunt) {
                     'manifest.json'
                 ],
                 dest: 'build/storage-area-explorer-v<%=pkg.version%>_' + Date.now() + '.zip'
+            },
+            testsCoverage:{
+                compression:'DEFLATE',
+                src: [
+                    'coverage/Chrome */**'
+                ],
+                dest:'build/coverage.zip'
             }
-
         }
     });
 
