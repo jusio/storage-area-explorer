@@ -1,12 +1,9 @@
 {
     "name": "storage-area-explorer",
     "version": "0.2.1",
-    "main": "path/to/main.css",
-    "ignore": [
-        "**/**"
-    ],
     "dependencies": {
-        "angular": "1.0.5"
+        "angular": "1.0.5",
+        "jquery": "2.0.3"
     },
     "devDependencies": {
     }
