@@ -14,14 +14,12 @@ module.exports = function (config) {
 
         // list of files / patterns to load in the browser
         files: [
-            'app/components/jquery/jquery.js',
-            'app/components/angular/angular.js',
+            'components/jquery/jquery.js',
+            'components/angular/angular.js',
             'app/*.js',
-            'app/services/*.js',
-            'app/directives/*.js',
-            'app/filters/*.js',
-            'mocks/**.js',
-            'test/**/*.test.js'
+            'app/**/*.js',
+            'mocks/*.js',
+            'test/**/*.js'
         ],
 
 
