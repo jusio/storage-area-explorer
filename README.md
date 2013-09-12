@@ -1,18 +1,16 @@
-# Storage Area Explorer 0.2.1
+# Storage Area Explorer [![Build Status](https://drone.io/github.com/jusio/storage-area-explorer/status.png)](https://drone.io/github.com/jusio/storage-area-explorer/latest)
 
 
 This is a simple extension which allows to inspect [Storage Area](http://developer.chrome.com/apps/storage.html) of [Chrome Packaged Apps](http://developer.chrome.com/apps/about_apps.html)
 
-Storage Area tab is added to the devtools, so you'll need to inspect app in order to reveal this tab.
+Storage Area tab is added to the devtools, so you'll need to inspect Chrome App or Chrome Extension (tab is not shown if app doesn't have storage permission) in order to reveal this tab.
 
 
+Install from latest stable 0.1 version from [Chrome Store](https://chrome.google.com/webstore/detail/storage-area-explorer/ocfjjjjhkpapocigimmppepjgfdecjkb)
 
 
-~~This extension is not yet deployed to the Chrome Web Store since I don't have a nice icon yet (and most likely Chrome team will add such feature sooner or later).~~
+[Development version v0.2.1](https://drone.io/github.com/jusio/storage-area-explorer/files)
 
-~~So to use it you need to checkout and manually install this extension.~~
-
-Install from [Chrome Store](https://chrome.google.com/webstore/detail/storage-area-explorer/ocfjjjjhkpapocigimmppepjgfdecjkb)
 
 Screenshots
 
