@@ -20,7 +20,7 @@ module.exports = function (config) {
             'components/angular-mocks/angular-mocks.js',
             'app/*.js',
             'app/**/*.js',
-            'test/src/*/*.js'
+            'test/unit/*/*.js'
         ],
         preprocessors: {
             'app/*.js': 'coverage',
@@ -30,8 +30,7 @@ module.exports = function (config) {
 
         // list of files to exclude
         exclude: [
-            '*.min.js',
-            'app/chrome/**'
+            '*.min.js'
         ],
 
 

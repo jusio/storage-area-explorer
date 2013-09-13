@@ -1,16 +1,9 @@
-angular.module("storageExplorer").factory("appContext", function ($q, $rootScope) {
+angular.module("storageExplorer").factory("appContext", function ($q, $rootScope, evalService) {
     var appDeferred = $q.defer();
     var appInfo = appDeferred.promise;
-    if (!chrome.devtools) {
-        return function () {
-            return $q.defer().promise
-        }
-    }
-
-
-    var inspectedWindow = chrome.devtools.inspectedWindow;
-    inspectedWindow.eval('(function(){console.log(chrome.runtime.getManifest()); return {id:chrome.runtime.id, manifest:chrome.runtime.getManifest()};})()', function (result, isError) {
-        if (result && !isError) {
+    evalService.evalFunction(function () {
+        return {id: chrome.runtime.id, manifest: chrome.runtime.getManifest()};
+    }).then(function (result) {
             var info = {
                 id: result.id,
                 name: result.manifest.name,
@@ -20,20 +13,23 @@ angular.module("storageExplorer").factory("appContext", function ($q, $rootScope
             appDeferred = null;
             appInfo = info;
 
-        } else {
+        }, function () {
             appDeferred.reject();
             appDeferred = null;
-            appInfo = {id: "unknown", name: "unknown", manifest: {}};
-        }
-        $rootScope.$apply();
-    });
+            appInfo = null;
+        });
+
 
     return function () {
         var deferred = $q.defer();
         if (appInfo) {
             $q.when(appInfo).then(function (result) {
                 deferred.resolve(result);
+            }, function () {
+                deferred.reject();
             });
+        } else {
+            deferred.reject();
         }
         return deferred.promise;
     }
