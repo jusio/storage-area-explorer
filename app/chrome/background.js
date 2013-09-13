@@ -1,4 +1,4 @@
-function initializeExtension(runtime, extension,$document) {
+function initializeExtension(runtime, extension) {
     var ports = {};
     extension.onConnect.addListener(function (port) {
         if (!ports[port.name]) {
@@ -33,21 +33,21 @@ function initializeExtension(runtime, extension,$document) {
         if (message.action === 'copy') {
             area.value = message.params[0];
             area.select();
-            $document.execCommand('copy');
+            document.execCommand('copy');
             response && response();
             area.value = '';
             return;
         }
         if (message.action === 'paste') {
             area.select();
-            $document.execCommand("paste");
+            document.execCommand("paste");
             response && response(area.value);
             area.value = '';
         }
     });
 
-    var area = $document.createElement("textarea");
-    $document.body.appendChild(area);
+    var area = document.createElement("textarea");
+    document.body.appendChild(area);
 
 }
-initializeExtension(chrome.runtime, chrome.extension,document);
+initializeExtension(chrome.runtime, chrome.extension);

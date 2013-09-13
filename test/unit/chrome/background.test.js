@@ -1,31 +1,7 @@
 describe("Testing appContext Service", function () {
 
 
-    function createEvent() {
-        var event = function () {
-            var args = [];
-            for (var i = 0; i < arguments.length; i++) {
-                args.push(arguments[i]);
-            }
 
-            event.listeners.forEach(function (listener) {
-                listener.apply(null, args);
-            });
-        };
-        event.listeners = [];
-        event.addListener = function () {
-            event.listeners.push(arguments[0]);
-        };
-
-        return event;
-    }
-
-    function createMockPort() {
-        return {
-            onMessage: createEvent(),
-            onDisconnect: createEvent()
-        };
-    }
 
     var runtime = {};
 
@@ -35,11 +11,11 @@ describe("Testing appContext Service", function () {
     beforeEach(function () {
         resetChromeApi();
         extension = {
-            onConnect: createEvent()
+            onConnect: chrome.mocks.createEvent()
         };
         runtime = {
-            onMessage: createEvent(),
-            onMessageExternal: createEvent()
+            onMessage: chrome.mocks.createEvent(),
+            onMessageExternal: chrome.mocks.createEvent()
         };
 
     });
@@ -53,7 +29,7 @@ describe("Testing appContext Service", function () {
     });
 
     it("Should correctly listen on port", function () {
-        var port = createMockPort();
+        var port = chrome.mocks.createMockPort();
         initializeExtension(runtime, extension);
         extension.onConnect(port, {name: "test"});
         expect(port.onMessage.listeners.length).toBe(1);
