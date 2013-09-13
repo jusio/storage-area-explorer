@@ -59,6 +59,9 @@ chrome.mocks = {
             onDisconnect: chrome.mocks.createEvent(),
             postMessage:function(){
 
+            },
+            disconnect:function(){
+                this.onDisconnect();
             }
         };
     }

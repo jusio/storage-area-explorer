@@ -1,6 +1,6 @@
-(function () {
-    var panels = chrome.devtools.panels;
-    chrome.devtools.inspectedWindow.eval("!!chrome.storage", function (res) {
+
+function initializeDevtoolsPage(panels, inspectedWindow) {
+    inspectedWindow.eval("!!chrome.storage", function (res) {
         if (res) {
             panels.create(
                 "Storage Explorer",
@@ -9,4 +9,6 @@
             );
         }
     });
-})();
+}
+initializeDevtoolsPage(chrome.devtools.panels, chrome.devtools.inspectedWindow);
+
