@@ -49,7 +49,7 @@ describe("Testing appContext Service", function () {
         chrome.runtime.getManifest =function(){};
         evalService.evalFunction = function (fnc) {
             var defer = q.defer();
-                fnc();
+                fnc(chrome);
             defer.reject();
             return defer.promise;
         };

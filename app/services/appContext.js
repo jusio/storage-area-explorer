@@ -1,7 +1,7 @@
 angular.module("storageExplorer").factory("appContext", function ($q, $rootScope, evalService) {
     var appDeferred = $q.defer();
     var appInfo = appDeferred.promise;
-    evalService.evalFunction(function () {
+    evalService.evalFunction(function (chrome) {
         return {id: chrome.runtime.id, manifest: chrome.runtime.getManifest()};
     }).then(function (result) {
             var info = {

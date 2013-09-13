@@ -1,9 +1,16 @@
 angular.module("storageExplorer").service("evalService", function (devtools, $q, $rootScope) {
 
-    this.evalFunction = function (closure) {
+    this.evalFunction = function (closure, parameters) {
         var deferred = $q.defer();
 
-        devtools.inspectedWindow.eval("(" + closure + ")()", function (value, isError) {
+        var closureString = closure.toString();
+        if (parameters) {
+            Object.keys(parameters).forEach(function (key) {
+                closureString = closureString.replace(key, parameters[key]);
+            });
+        }
+
+        devtools.inspectedWindow.eval("(" + closureString + ")(chrome)", function (value, isError) {
             if (isError) {
                 deferred.reject(value);
             } else {

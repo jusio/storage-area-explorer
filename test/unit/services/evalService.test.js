@@ -43,16 +43,29 @@ describe("Testing evalService", function () {
             console.log("Error");
         });
         rootScope.$apply();
-        expect(inputString).toBe("()()");
+        expect(inputString).toBe("()(chrome)");
         expect(obtainedResult).toBe(expectedResult);
         _devtools.inspectedWindow.eval = function (input, fnc) {
             fnc(null, true);
         };
         var spy = jasmine.createSpy("callback");
-        _evalService.evalFunction("").then(function(){},spy);
+        _evalService.evalFunction("").then(function () {
+        }, spy);
         rootScope.$apply();
         expect(spy).toHaveBeenCalled();
+    });
 
+    it("Should inject parameters", function () {
+        var params = {PARAM: "PARAM_VALUE"};
+        spyOn(_devtools.inspectedWindow, 'eval').andCallFake(function (closure, callback) {
+            expect(closure).toBe("(PARAM_VALUE)(chrome)");
+            callback();
+        });
+        var callback = jasmine.createSpy("callback");
+        _evalService.evalFunction("PARAM", params).then(callback);
+        rootScope.$apply();
+        expect(_devtools.inspectedWindow.eval).toHaveBeenCalled();
+        expect(callback).toHaveBeenCalled();
 
     });
 

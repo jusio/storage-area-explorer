@@ -1,6 +1,6 @@
 angular.module("storageExplorer").factory("storage", function ($q, $rootScope, appContext, evalService, runtime, delegateStorage) {
     //TODO find some other way to define this script
-    var injectedScript = function () {
+    var injectedScript = function (chrome) {
         var from = "APP_ID";
         chrome.storage.onChanged.addListener(function (changes, name) {
             chrome.runtime.sendMessage(from, {change: true, changes: changes, type: name});
@@ -12,8 +12,8 @@ angular.module("storageExplorer").factory("storage", function ($q, $rootScope, a
                 var method = storage[message.method];
                 var args = [];
                 if (message.args) {
-                    message.args.forEach(function(arg){
-                       args.push(arg);
+                    message.args.forEach(function (arg) {
+                        args.push(arg);
                     });
                 }
                 args.push(function () {
@@ -49,17 +49,13 @@ angular.module("storageExplorer").factory("storage", function ($q, $rootScope, a
             port.onMessage.addListener(function (message) {
                 if (message.from === remoteId && message.obj.change) {
                     $rootScope.$broadcast("$storageChanged", message.obj);
-                    if (!$rootScope.$$phase) {
-                        $rootScope.$apply();
-                    }
+                    !$rootScope.$$phase && $rootScope.$apply();
                 }
             });
-            return evalService.evalFunction(injectedScript.toString().replace("APP_ID", runtime.id))
+            return evalService.evalFunction(injectedScript, {'APP_ID': runtime.id});
         }).then(function () {
             connectionDeferred.resolve({port: port, remoteId: remoteId});
-            if (!$rootScope.$$phase) {
-                $rootScope.$apply();
-            }
+            !$rootScope.$$phase && $rootScope.$apply();
         });
 
 
