@@ -72,44 +72,22 @@ angular.module("storageExplorer").directive("entryValue", function ($compile) {
         return arrayTemplate.replace("{{displayedValue}}", template.join(''));
     }
 
-    function buildObjectPreview(obj) {
-
-        function rval(val) {
-            if (angular.isString(val)) {
-                return string(val);
-            }
-            if (angular.isNumber(val)) {
-                return num(val);
-            }
-            if (angular.isObject(val)) {
-                return buildObjectPreview(val);
-            }
-            if (val === null) {
-                return bool('null');
-            }
-            return bool(val);
+    function val(val) {
+        if (angular.isString(val)) {
+            return string(val);
         }
-
-
-        var element = angular.element('<span></span>');
-        if (angular.isArray(obj)) {
-            element.append(angular.element('<span>[</span>'));
-            element.append(angular.element('<span>array</span>'));
-            element.append(angular.element('<span> ]</span>'))
-        } else if (angular.isObject(obj)) {
-            element.append(angular.element('<span>{</span>'));
-            angular.forEach(obj, function (value, key) {
-                element.append(string(key)).append(':').append(rval(value)).append(',');
-            });
-
-
-            element.append(angular.element('<span>}</span>'))
+        if (angular.isNumber(val)) {
+            return num(val);
         }
-        element.bind("click", function () {
-
-        });
-        return element;
+        if (angular.isObject(val)) {
+            return object(val);
+        }
+        if (val === null) {
+            return bool('null');
+        }
+        return bool(val);
     }
+
 
     return {
         restrict: 'E',
@@ -118,19 +96,7 @@ angular.module("storageExplorer").directive("entryValue", function ($compile) {
         },
         link: function (scope, element, attr) {
             var value = scope.value;
-            if (angular.isString(value)) {
-                element.html(string(value));
-            } else if (angular.isNumber(value)) {
-                element.html(num(value));
-            } else if (angular.isObject(value)) {
-                element.html('');
-                var testElement = document.createElement("div");
-                element.append(object(value));
-            } else if (value === null) {
-                element.html(bool('null'));
-            } else {
-                element.html(bool(value));
-            }
+            element.append(val(value));
         }
     }
 

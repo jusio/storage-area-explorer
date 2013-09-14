@@ -1,7 +1,7 @@
 <div ng-controller="StorageCtrl" class="main">
     <div class="header">
         <ul class="nav nav-tabs">
-            <li ng-class="{active:currentType == 'local'}" ng-click="currentType = 'local'"><a>Local Storage Area
+            <li ng-class="{active:currentType == 'local'}" ng-click="setType('local')"><a>Local Storage Area
 
                 <div class="usage" ng-show="stats.local.bytesInUse > 0">{{stats.local.bytesInUse |
                     prettyBytes}} / {{meta.local.QUOTA_BYTES | prettyBytes}}
@@ -10,7 +10,7 @@
                     area is empty
                 </div>
             </a></li>
-            <li ng-class="{active:currentType == 'sync'}" ng-click="currentType = 'sync'"><a>Synchronous Storage
+            <li ng-class="{active:currentType == 'sync'}" ng-click="setType('sync')"><a>Synchronous Storage
                 Area
                 <div class="usage" ng-show="stats.sync.bytesInUse > 0">{{stats.sync.bytesInUse |
                     prettyBytes}} / {{meta.sync.QUOTA_BYTES | prettyBytes}}, {{stats.sync.count}} /
@@ -34,7 +34,7 @@
 
     </div>
     <div ng-show="mode == 'list'" class="list">
-        <div class="controls">
+        <div class="controls" ng-controller="ExportImportCtrl">
             <button class="btn btn-primary btn-xs" ng-click="add()">Add Item</button>
             <button class="btn btn-warning btn-xs" ng-click="clear()" ng-show="itemCount > 0">Clear</button>
             <div class="btn-group" ng-show="itemCount > 0">
@@ -56,9 +56,6 @@
                     <li><a href="#" ng-click="import()">From File</a></li>
                     <li><a href="#" ng-click="importClipboard()">From Clipboard</a></li>
                 </ul>
-            </div>
-            <div ng-show="fileImport">
-                <input type="file" id="fileImport"/>
             </div>
         </div>
 
@@ -101,15 +98,15 @@
 
     </div>
 
-    <div ng-show="mode == 'edit' || mode == 'add'" class="editPanel">
+    <div ng-show="mode == 'edit' || mode == 'add'" class="editPanel" ng-controller="AddEditItemCtrl">
 
-        <input id="key" class="key form-control" type="text" ng-model="key" placeholder="Name Of Key">
+        <input id="key" class="key form-control" type="text" ng-model="editObject.key" placeholder="Name Of Key">
 
         <span class="text-info" ng-show="!validation">Value in JSON format e.g. all the strings should be enclosed in double quotes: "example"</span>
         <span class="text-warning"
               ng-show="validation">Value is not valid JSON: {{validation}}</span>
 
-        <textarea id="value" class="value form-control" ng-model="value" placeholder='Value '>
+        <textarea id="value" class="value form-control" ng-model="editObject.value" placeholder='Value '>
 
         </textarea>
 

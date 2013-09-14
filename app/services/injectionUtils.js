@@ -9,15 +9,17 @@ angular.module("storageExplorer").service("evalService", function (devtools, $q,
                 closureString = closureString.replace(key, parameters[key]);
             });
         }
+        if (devtools) {
 
-        devtools.inspectedWindow.eval("(" + closureString + ")(chrome)", function (value, isError) {
-            if (isError) {
-                deferred.reject(value);
-            } else {
-                deferred.resolve(value)
-            }
-            $rootScope.$apply();
-        });
+            devtools.inspectedWindow.eval("(" + closureString + ")(chrome)", function (value, isError) {
+                if (isError) {
+                    deferred.reject(value);
+                } else {
+                    deferred.resolve(value)
+                }
+                $rootScope.$apply();
+            });
+        }
 
         return deferred.promise;
 
