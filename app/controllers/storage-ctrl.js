@@ -1,6 +1,4 @@
 angular.module("storageExplorer").controller("StorageCtrl", function ($scope, storage, prettyJson, appContext, clipboard) {
-    dummyLog("Initializing controller");
-
     $scope.sizeMap = {};
     $scope.mode = 'list';
     $scope.currentType = 'local';
