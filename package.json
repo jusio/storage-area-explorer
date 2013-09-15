@@ -1,6 +1,6 @@
 {
   "name": "storage-area-explorer",
-  "version": "0.2.1",
+  "version": "0.2.3",
   "devDependencies": {
     "grunt": "~0.4.1",
     "karma": "~0.10.2",
