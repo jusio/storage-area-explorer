@@ -6,10 +6,10 @@ This is a simple extension which allows to inspect [Storage Area](http://develop
 Storage Area tab is added to the devtools, so you'll need to inspect Chrome App or Chrome Extension (tab is not shown if app doesn't have storage permission) in order to reveal this tab.
 
 
-Install from latest stable 0.1 version from [Chrome Store](https://chrome.google.com/webstore/detail/storage-area-explorer/ocfjjjjhkpapocigimmppepjgfdecjkb)
+Install from latest stable 0.2.3 version from [Chrome Store](https://chrome.google.com/webstore/detail/storage-area-explorer/ocfjjjjhkpapocigimmppepjgfdecjkb)
 
 
-[Development version v0.2.1](https://drone.io/github.com/jusio/storage-area-explorer/files)
+[Development version v0.3.1](https://drone.io/github.com/jusio/storage-area-explorer/files)
 
 
 Screenshots
