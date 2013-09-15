@@ -18,7 +18,6 @@ module.exports = function (grunt) {
                     }
                     return filepath;
                 },
-                compression: 'DEFLATE',
                 src: [
                     'components/bootstrap/dist/css/bootstrap.min.css',
                     'components/bootstrap/dist/js/bootstrap.min.js',
