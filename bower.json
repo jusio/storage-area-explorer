@@ -1,6 +1,6 @@
 {
     "name": "storage-area-explorer",
-    "version": "0.2.3",
+    "version": "0.3.1",
     "dependencies": {
         "angular": "1.0.8",
         "jquery": "2.0.3",
