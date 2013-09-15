@@ -110,7 +110,10 @@ angular.module("storageExplorer").directive("entryValue", function ($compile) {
                 editor.bind("keydown", function (e) {
                         editor.css("backgroundColor","");
                     if (e.keyCode == 13) {
-                        var newValue = editor.val();
+                        var newValue = editor.val().trim();
+                        if(newValue == "") {
+                            newValue = null;
+                        }
                         try {
                             scope.$emit("$valueChanged", scope.key, angular.fromJson(newValue));
                         } catch (e) {
