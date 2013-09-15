@@ -63,11 +63,11 @@
         <table ng-show="itemCount > 0" class="table table-striped table-hover">
             <thead>
             <tr class="list-row">
-                <th style="width: 20em">
+                <th>
                     Key
                 </th>
-                <th style="width:100%">Value</th>
-                <th style="width:100px"></th>
+                <th width="100%">Value</th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
@@ -78,9 +78,9 @@
                         <span ng-show="currentType == 'sync'"> / {{meta.sync.QUOTA_BYTES_PER_ITEM | prettyBytes}}</span>
                     </div>
                 </td>
-                <td class="displayedValue">
+                <td>
 
-                    <entry-value class="displayedValue" value="value"/>
+                    <entry-value class="displayedValue" value="value" key="name"/>
                 </td>
                 <td style="white-space: nowrap">
 

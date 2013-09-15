@@ -45,6 +45,7 @@ table {
 }
 table tbody tr.list-row td {
     padding: 4px 4px 4px 16px;
+    position:relative;
 }
 
 table thead tr.list-row th {
@@ -53,9 +54,18 @@ table thead tr.list-row th {
 th {
     text-align: left;
 }
+
 .displayedValue {
     white-space: nowrap;
     font-family: monospace;
+    display: block;
+    overflow: hidden;
+    min-width: 0;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 5px;
+    bottom: 0;
 }
 
 /*.object {*/

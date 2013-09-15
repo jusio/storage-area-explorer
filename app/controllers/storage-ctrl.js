@@ -1,8 +1,8 @@
-angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $rootScope, storage, prettyJson, $window) {
+angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $rootScope, storage, prettyJson, $window, $timeout) {
     $scope.sizeMap = {};
     $rootScope.mode = 'list';
     $rootScope.currentType = 'local';
-    $rootScope.setType = function(type){
+    $rootScope.setType = function (type) {
         $rootScope.currentType = type;
     };
     $rootScope.editObject = {};
@@ -76,6 +76,18 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $r
                 }
             });
             refreshStats();
+        }
+    });
+    $scope.$on("$valueChanged", function (event, key, newValue) {
+        try {
+            var update = {};
+            update[key] = newValue;
+            //bug? for some reason changes aren't committed
+            $timeout(function () {
+                storage[$rootScope.currentType].set(update);
+            },1);
+
+        } catch (e) {
         }
     });
 

@@ -92,11 +92,38 @@ angular.module("storageExplorer").directive("entryValue", function ($compile) {
     return {
         restrict: 'E',
         scope: {
-            value: "="
+            value: "=",
+            key: "="
         },
         link: function (scope, element, attr) {
             var value = scope.value;
             element.append(val(value));
+            element.bind("dblclick", function () {
+                var editor = angular.element("<input type='text' style='width:100%;height:100%'>");
+                editor.val(angular.toJson(value));
+                element.html('');
+                element.append(editor);
+                editor.select();
+                editor.bind("blur", function () {
+                    element.html(val(value));
+                });
+                editor.bind("keydown", function (e) {
+                        editor.css("backgroundColor","");
+                    if (e.keyCode == 13) {
+                        var newValue = editor.val();
+                        try {
+                            scope.$emit("$valueChanged", scope.key, angular.fromJson(newValue));
+                        } catch (e) {
+                            editor.css("backgroundColor","red");
+                            return;
+                        }
+
+                    }
+                    if (e.keyCode == 13 || e.keyCode == 27) {
+                        editor.blur();
+                    }
+                });
+            });
         }
     }
 
