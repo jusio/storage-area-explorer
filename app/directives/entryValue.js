@@ -21,7 +21,7 @@ angular.module("storageExplorer").directive("entryValue", function ($compile) {
             '>': '&gt;'
         };
         for (var i = 0; i < string.length; i++) {
-            if(angular.isDefined(replace[string.charAt(i)])) {
+            if (angular.isDefined(replace[string.charAt(i)])) {
                 newString.push(replace[string.charAt(i)]);
                 continue;
             }
@@ -108,16 +108,15 @@ angular.module("storageExplorer").directive("entryValue", function ($compile) {
             key: "="
         },
         link: function (scope, element, attr) {
-            var value = scope.value;
-            element.append(val(value));
+            element.append(val(scope.value));
             element.bind("dblclick", function () {
                 var editor = angular.element("<input type='text' style='width:100%;height:100%'>");
-                editor.val(JSON.stringify(value));
+                editor.val(JSON.stringify(scope.value));
                 element.html('');
                 element.append(editor);
                 editor.select();
                 editor.bind("blur", function () {
-                    element.html(val(value));
+                    element.html(val(scope.value));
                 });
                 editor.bind("keydown", function (e) {
                     editor.css("backgroundColor", "");
@@ -134,10 +133,15 @@ angular.module("storageExplorer").directive("entryValue", function ($compile) {
                         }
 
                     }
-                    if (e.keyCode == 13 || e.keyCode == 27) {
+                    if (e.keyCode == 27) {
                         editor.blur();
                     }
                 });
+            });
+
+            scope.$watch('value', function () {
+                element.html('');
+                element.html(val(scope.value));
             });
         }
     }
