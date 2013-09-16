@@ -1,11 +1,35 @@
 angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $rootScope, storage, prettyJson, $window, $timeout) {
     var rawData;
-
+    $scope.results = [];
     function adaptRawData() {
-        $scope.results = [];
-        Object.keys(rawData).forEach(function (key) {
-            $scope.results.push({name: key, value: JSON.parse(JSON.stringify(rawData[key]))})
+        var resultsToRemove = [];
+        var keys = Object.keys(rawData);
+        var leftOverKeys = Object.keys(rawData);
+        $scope.results.forEach(function (result) {
+            if (keys.indexOf(result.name) > -1) {
+                result.value = JSON.parse(JSON.stringify(rawData[result.name]));
+                leftOverKeys.splice(leftOverKeys.indexOf(result.name), 1);
+            } else {
+                resultsToRemove.push(result);
+            }
         });
+        leftOverKeys.forEach(function (key) {
+            $scope.results.push({name: key, value: JSON.parse(JSON.stringify(rawData[key]))});
+        });
+
+        resultsToRemove.forEach(function (resultToRemove) {
+            $scope.results.splice($scope.results.indexOf(resultToRemove), 1);
+        });
+        $scope.results.sort(function (a, b) {
+            if (a.name > b.name) {
+                return 1
+            }
+            if(a.name < b.name) {
+                return -1;
+            }
+            return 0;
+        });
+
     }
 
     $scope.sizeMap = {};

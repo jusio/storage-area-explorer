@@ -75,7 +75,7 @@ describe("Testing storage controller", function () {
     });
 
     it("should adapt changes when storage is changed", function () {
-
+        var results = scope.results;
         localStorageMock.get.andCallFake(function (callback) {
             callback({
                 "myKey": "test",
@@ -89,14 +89,7 @@ describe("Testing storage controller", function () {
             mySecondKey: {newValue: "newValue"},
             newKey: {newValue: true}
         }, type: "local"});
-        var results = scope.results.sort(function (a, b) {
-            if (a.name > b.name)
-                return 1;
-            if (a.name < b.name)
-                return -1;
-            // a must be equal to b
-            return 0;
-        });
+        expect(results).toBe(scope.results);
         expect(results.length).toBe(3);
         expect(results.filter(function (a) {
             return a.name === 'myKey';
