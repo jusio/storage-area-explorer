@@ -14,10 +14,25 @@ angular.module("storageExplorer").directive("entryValue", function ($compile) {
 
     function escape(input) {
         var string = '' + input;
-        return string.replace('<', '&lt;').replace('>', '&gt;')
+        var newString = [];
+        var replace = {
+            '$': '&#36;',
+            '<': '&lt;',
+            '>': '&gt;'
+        };
+        for (var i = 0; i < string.length; i++) {
+            if(angular.isDefined(replace[string.charAt(i)])) {
+                newString.push(replace[string.charAt(i)]);
+                continue;
+            }
+            newString.push(string.charAt(i));
+        }
+
+        return newString.join('');
     }
 
     function string(value) {
+
         return stringTemplate.replace('{{displayedValue}}', checkWidth(escape(value)));
     }
 
@@ -42,12 +57,10 @@ angular.module("storageExplorer").directive("entryValue", function ($compile) {
         if (angular.isObject(value)) {
             var template = [];
             angular.forEach(value, function (propVal, propKey) {
-                if (propKey !== "$$hashKey") {
-                    template.push(string(propKey));
-                    template.push(" : ");
-                    template.push(object(propVal));
-                    template.push(", ");
-                }
+                template.push(string(propKey));
+                template.push(" : ");
+                template.push(object(propVal));
+                template.push(", ");
             });
             template.pop();
             return objectTemplate.replace("{{displayedValue}}", template.join(''));
@@ -99,7 +112,7 @@ angular.module("storageExplorer").directive("entryValue", function ($compile) {
             element.append(val(value));
             element.bind("dblclick", function () {
                 var editor = angular.element("<input type='text' style='width:100%;height:100%'>");
-                editor.val(angular.toJson(value));
+                editor.val(JSON.stringify(value));
                 element.html('');
                 element.append(editor);
                 editor.select();
@@ -107,16 +120,16 @@ angular.module("storageExplorer").directive("entryValue", function ($compile) {
                     element.html(val(value));
                 });
                 editor.bind("keydown", function (e) {
-                        editor.css("backgroundColor","");
+                    editor.css("backgroundColor", "");
                     if (e.keyCode == 13) {
                         var newValue = editor.val().trim();
-                        if(newValue == "") {
+                        if (newValue == "") {
                             newValue = null;
                         }
                         try {
-                            scope.$emit("$valueChanged", scope.key, angular.fromJson(newValue));
+                            scope.$emit("$valueChanged", scope.key, JSON.parse(newValue));
                         } catch (e) {
-                            editor.css("backgroundColor","red");
+                            editor.css("backgroundColor", "red");
                             return;
                         }
 
