@@ -25,7 +25,8 @@
     </div>
     <div class="alert alert-danger" ng-show="importError">
         <button type="button" class="close" ng-click="importError = null">&times;</button>
-        <strong>Import <span ng-show="importError.file"> from file {{importError.file}}</span><span ng-show="!importError.file">from clipboard </span> failed</strong><br>
+        <strong>Import <span ng-show="importError.file"> from file {{importError.file}}</span><span
+                ng-show="!importError.file">from clipboard </span> failed</strong><br>
         {{importError.message}}<br>
         <strong>{{importError.type}} contents</strong>
         <pre>
@@ -71,22 +72,21 @@
             </tr>
             </thead>
             <tbody>
-            <tr ng-repeat="(name, value) in results" class="list-row">
-                <td><span class="valueKey">{{name}}</span>
+            <tr ng-repeat="result in results" class="list-row">
+                <td><span class="valueKey">{{result.name}}</span>
 
-                    <div class="usage"> {{sizeMap[name] | prettyBytes}}
+                    <div class="usage"> {{result.bytesInUse | prettyBytes}}
                         <span ng-show="currentType == 'sync'"> / {{meta.sync.QUOTA_BYTES_PER_ITEM | prettyBytes}}</span>
                     </div>
                 </td>
                 <td>
-
-                    <entry-value class="displayedValue" value="value" key="name"/>
+                    <entry-value class="displayedValue" value="result.value" key="result.name"/>
                 </td>
                 <td style="white-space: nowrap">
 
-                    <button class="btn btn-default btn-xs" ng-click="edit(name,value)"><span
+                    <button class="btn btn-default btn-xs" ng-click="edit(result.name)"><span
                             class="glyphicon glyphicon-edit"></span></button>
-                    <button class="btn btn-danger btn-xs" ng-click="delete(name)"><span
+                    <button class="btn btn-danger btn-xs" ng-click="delete(result.name)"><span
                             class="glyphicon glyphicon-remove-circle"></span></button>
                 </td>
             </tr>

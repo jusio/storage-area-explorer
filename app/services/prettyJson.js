@@ -25,9 +25,6 @@ angular.module("storageExplorer").factory("prettyJson", function () {
                 json.push("{\n");
                 var empty = true;
                 angular.forEach(val, function (value, key) {
-                    if (key === '$$hashKey') {
-                        return;
-                    }
                     empty = false;
                     tabs(depth + 1);
                     json.push('"' + key + '" : ');

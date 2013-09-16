@@ -1,4 +1,13 @@
 angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $rootScope, storage, prettyJson, $window, $timeout) {
+    var rawData;
+
+    function adaptRawData() {
+        $scope.results = [];
+        Object.keys(rawData).forEach(function (key) {
+            $scope.results.push({name: key, value: JSON.parse(JSON.stringify(rawData[key]))})
+        });
+    }
+
     $scope.sizeMap = {};
     $rootScope.mode = 'list';
     $rootScope.currentType = 'local';
@@ -24,11 +33,12 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $r
     };
 
 
-    $scope.edit = function (name, value) {
+    $scope.edit = function (name) {
         $rootScope.mode = 'edit';
         $rootScope.editObject.key = name;
+        var value = rawData[name];
         if (!angular.isObject(value)) {
-            $rootScope.editObject.value = angular.toJson(value);
+            $rootScope.editObject.value = JSON.stringify(value);
         } else {
             $rootScope.editObject.value = prettyJson(value);
         }
@@ -43,7 +53,8 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $r
 
     $rootScope.$watch('currentType', function () {
         storage[$rootScope.currentType].get(function (results) {
-            $scope.results = results;
+            rawData = results;
+            adaptRawData();
             refreshStats();
         });
     });
@@ -59,10 +70,10 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $r
         storage.sync.get(function (obj) {
             $scope.stats.sync.count = Object.keys(obj).length;
         });
-        angular.forEach($scope.results, function (val, key) {
+        angular.forEach($scope.results, function (val) {
             $scope.itemCount++;
-            storage[$scope.currentType].getBytesInUse(key, function (amount) {
-                $scope.sizeMap[key] = amount;
+            storage[$scope.currentType].getBytesInUse(val.name, function (amount) {
+                val.bytesInUse = amount;
             });
         });
     }
@@ -71,11 +82,12 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $r
         if ($scope.currentType === change.type) {
             angular.forEach(change.changes, function (val, key) {
                 if (angular.isDefined(val.newValue)) {
-                    $scope.results[key] = val.newValue;
+                    rawData[key] = val.newValue;
                 } else {
-                    delete $scope.results[key];
+                    delete rawData[key];
                 }
             });
+            adaptRawData();
             refreshStats();
         }
     });
@@ -86,7 +98,7 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $r
             //bug? for some reason changes aren't committed
             $timeout(function () {
                 storage[$rootScope.currentType].set(update);
-            },1);
+            }, 1);
 
         } catch (e) {
         }

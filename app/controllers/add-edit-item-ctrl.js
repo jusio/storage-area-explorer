@@ -18,7 +18,7 @@ angular.module("storageExplorer").controller("AddEditItemCtrl", function ($scope
     $scope.save = function () {
         var obj = {};
         var editObj = $rootScope.editObject;
-        obj[editObj.key] = angular.fromJson(editObj.value);
+        obj[editObj.key] = JSON.parse(editObj.value);
         storage[$rootScope.currentType].set(obj, function () {
             $scope.cancel();
         });

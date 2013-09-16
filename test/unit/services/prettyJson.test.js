@@ -34,8 +34,8 @@ describe("pretty json test", function () {
         compareObj(obj,parsed);
     });
 
-    it("Should ignore $$hashKey",function(){
-        expect(JSON.parse(prettyJsonInst({"$$hashKey":true}))["$$hashKey"]).toBeFalsy();
+    it("Should not ignore $$hashKey",function(){
+        expect(JSON.parse(prettyJsonInst({"$$hashKey":true}))["$$hashKey"]).toBe(true);
     });
 
     afterEach(function(){

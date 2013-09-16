@@ -71,25 +71,39 @@ describe("Testing storage controller", function () {
         expect(localStorageMock.getBytesInUse).toHaveBeenCalled();
         expect(syncStorageMock.getBytesInUse).toHaveBeenCalled();
         expect(scope.currentType).toBe("local");
-        expect(scope.results.test).toBe("test");
+        expect(scope.results[0].value).toBe("test");
     });
 
     it("should adapt changes when storage is changed", function () {
+
+        localStorageMock.get.andCallFake(function (callback) {
+            callback({
+                "myKey": "test",
+                "mySecondKey": "test2",
+                "unchangedKey": "unchangedValue"
+            });
+        });
         rootScope.$apply();
-        scope.results = {
-            myKey: "test",
-            mySecondKey: "test2",
-            unchangedKey: "unchangedValue"
-        };
         rootScope.$broadcast("$storageChanged", {changes: {
             myKey: {},
             mySecondKey: {newValue: "newValue"},
             newKey: {newValue: true}
         }, type: "local"});
-        expect(scope.results.myKey).not.toBeDefined();
-        expect(scope.results.mySecondKey).toBe("newValue");
-        expect(scope.results.newKey).toBe(true);
-        expect(scope.results.unchangedKey).toBe("unchangedValue");
+        var results = scope.results.sort(function (a, b) {
+            if (a.name > b.name)
+                return 1;
+            if (a.name < b.name)
+                return -1;
+            // a must be equal to b
+            return 0;
+        });
+        expect(results.length).toBe(3);
+        expect(results.filter(function (a) {
+            return a.name === 'myKey';
+        }).length).toBe(0);
+        expect(results[0].value).toBe("newValue");
+        expect(results[1].value).toBe(true);
+        expect(results[2].value).toBe("unchangedValue");
     });
 
     it("should ignore storage changes not for current storage type", function () {
@@ -129,17 +143,28 @@ describe("Testing storage controller", function () {
     });
 
     it("should initialized key,value  and switch to edit mode on edit()", function () {
-        scope.edit("test", 1);
+        localStorageMock.get.andCallFake(function (callback) {
+            callback({
+                "string": "string",
+                "number": 1,
+                "boolean": false,
+                "null": null,
+                "object": {},
+                "array": []
+            });
+        });
+        scope.$apply();
+        scope.edit("string");
         expect(rootScope.mode).toBe("edit");
-        expect(rootScope.editObject.key).toBe("test");
+        expect(rootScope.editObject.key).toBe("string");
         expect(prettyJsonMock).not.toHaveBeenCalled();
-        scope.edit("test", false);
+        scope.edit("boolean");
         expect(prettyJsonMock).not.toHaveBeenCalled();
-        scope.edit("test", "somestring");
+        scope.edit("number");
         expect(prettyJsonMock).not.toHaveBeenCalled();
-        scope.edit("test", null);
+        scope.edit("null");
         expect(prettyJsonMock).not.toHaveBeenCalled();
-        scope.edit("test", []);
+        scope.edit("object");
         expect(prettyJsonMock).toHaveBeenCalled();
     });
 
