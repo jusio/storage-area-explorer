@@ -6,6 +6,9 @@ angular.module("storageExplorer").factory("storage", function ($q, $rootScope, a
             chrome.runtime.sendMessage(from, {change: true, changes: changes, type: name});
         });
 
+//        window.addEventListener("unload",function(){
+//            chrome.runtime.sendMessage(from, "unload");
+//        });
         chrome.runtime.onMessageExternal.addListener(function (message, sender) {
             if (sender.id === from && message.target === chrome.runtime.id) {
                 var storage = chrome.storage[message.type];
@@ -44,6 +47,7 @@ angular.module("storageExplorer").factory("storage", function ($q, $rootScope, a
     };
     appContext()
         .then(function (appInfo) {
+
             remoteId = appInfo.id;
             port = runtime.connect({name: remoteId});
             port.onMessage.addListener(function (message) {
@@ -55,7 +59,7 @@ angular.module("storageExplorer").factory("storage", function ($q, $rootScope, a
             if (remoteId !== runtime.id) {
                 return evalService.evalFunction(injectedScript, {'APP_ID': runtime.id});
             }
-            return $q.reject();
+            return $q.when("");
         }).then(function () {
             connectionDeferred.resolve({port: port, remoteId: remoteId});
             !$rootScope.$$phase && $rootScope.$apply();

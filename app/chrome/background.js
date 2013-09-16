@@ -1,6 +1,7 @@
 function initializeExtension(runtime, extension, $document) {
     var ports = {};
     extension.onConnect.addListener(function (port) {
+        console.log("Connected");
         if (port.name && !ports[port.name]) {
             ports[port.name] = port;
             if (port.name === runtime.id) {
@@ -53,6 +54,7 @@ function initializeExtension(runtime, extension, $document) {
         if (port) {
             port.postMessage({from: sender.id, obj: message});
         } else {
+            console.log(message);
             throw new Error("There is no port for handling messages from " + sender.id);
         }
     });
