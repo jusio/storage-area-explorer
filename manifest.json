@@ -7,5 +7,6 @@
         "persistent": false,
         "scripts": ["app/chrome/background.js"]
     }, "permissions": ["storage","clipboardRead","clipboardWrite"],
+    "options_page":"app/html/options.html",
     "manifest_version": 2
 }
