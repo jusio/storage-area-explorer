@@ -43,7 +43,6 @@ angular.module("storageExplorer").directive("entryValue", function ($compile) {
             var template = [];
             angular.forEach(value, function (propVal, propKey) {
                 if (propKey !== "$$hashKey") {
-                    console.log(propKey);
                     template.push(string(propKey));
                     template.push(" : ");
                     template.push(object(propVal));

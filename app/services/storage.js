@@ -52,7 +52,10 @@ angular.module("storageExplorer").factory("storage", function ($q, $rootScope, a
                     !$rootScope.$$phase && $rootScope.$apply();
                 }
             });
-            return evalService.evalFunction(injectedScript, {'APP_ID': runtime.id});
+            if (remoteId !== runtime.id) {
+                return evalService.evalFunction(injectedScript, {'APP_ID': runtime.id});
+            }
+            return $q.reject();
         }).then(function () {
             connectionDeferred.resolve({port: port, remoteId: remoteId});
             !$rootScope.$$phase && $rootScope.$apply();
