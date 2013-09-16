@@ -1,14 +1,60 @@
 angular.module("storageExplorer").factory("storage", function ($q, $rootScope, appContext, evalService, runtime, delegateStorage) {
-    //TODO find some other way to define this script
+    if (!chrome.devtools) {
+        var returnValue = {};
+
+        function delegate(object, name) {
+            return function () {
+                var args = [];
+                for (var i = 0; i < arguments.length; i++) {
+                    if (angular.isFunction(arguments[i])) {
+                        (function (callback) {
+                            args.push(function (value) {
+                                callback(value);
+                                !$rootScope.$$phase && $rootScope.$apply();
+                            });
+                        })(arguments[i]);
+                        continue;
+                    }
+                    args.push(arguments[i]);
+                }
+                object[name].apply(object, args);
+            }
+        }
+
+
+        ['local', 'sync'].forEach(function (key) {
+            var meta = {};
+            var storageArea = chrome.storage[key];
+            var delegatedStorage = {};
+            returnValue[key] = delegatedStorage;
+            Object.keys(storageArea).forEach(function (stKey) {
+                if (angular.isFunction(storageArea[stKey])) {
+                    if (stKey.indexOf("on") === 0) {
+                        return;
+                    }
+                    delegatedStorage[stKey] = delegate(storageArea, stKey);
+                    return;
+                }
+                meta[stKey] = storageArea[stKey];
+            });
+            delegatedStorage.getMeta = function () {
+                return meta;
+            };
+
+        });
+        chrome.storage.onChanged.addListener(function (changes, type) {
+            $rootScope.$broadcast("$storageChanged", {changes: changes, type: type});
+        });
+
+        return returnValue;
+    }
+
     var injectedScript = function (chrome) {
         var from = "APP_ID";
         chrome.storage.onChanged.addListener(function (changes, name) {
             chrome.runtime.sendMessage(from, {change: true, changes: changes, type: name});
         });
-
-//        window.addEventListener("unload",function(){
-//            chrome.runtime.sendMessage(from, "unload");
-//        });
+//
         chrome.runtime.onMessageExternal.addListener(function (message, sender) {
             if (sender.id === from && message.target === chrome.runtime.id) {
                 var storage = chrome.storage[message.type];
@@ -41,7 +87,7 @@ angular.module("storageExplorer").factory("storage", function ($q, $rootScope, a
     var port;
     var remoteId;
     var connectionDeferred = $q.defer();
-    var returnValue = {
+    returnValue = {
         sync: delegateStorage(connectionDeferred.promise, "sync"),
         local: delegateStorage(connectionDeferred.promise, "local")
     };
@@ -56,10 +102,8 @@ angular.module("storageExplorer").factory("storage", function ($q, $rootScope, a
                     !$rootScope.$$phase && $rootScope.$apply();
                 }
             });
-            if (remoteId !== runtime.id) {
-                return evalService.evalFunction(injectedScript, {'APP_ID': runtime.id});
-            }
-            return $q.when("");
+
+            return evalService.evalFunction(injectedScript, {'APP_ID': runtime.id});
         }).then(function () {
             connectionDeferred.resolve({port: port, remoteId: remoteId});
             !$rootScope.$$phase && $rootScope.$apply();

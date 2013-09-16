@@ -18,6 +18,7 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $r
         storage[$scope.currentType].remove(key);
     };
     $scope.add = function () {
+        window.close();
         $rootScope.mode = 'add';
         $rootScope.editObject.value = '';
     };
