@@ -9,6 +9,13 @@ module.exports = function (grunt) {
                 configFile: 'karma.conf.js'
             }
         },
+        bower: {
+            install: {
+                options:{
+                    copy:false
+                }
+            }
+        },
         zip: {
             release: {
                 router: function (filepath) {
@@ -30,12 +37,12 @@ module.exports = function (grunt) {
                 ],
                 dest: 'build/storage-area-explorer-v<%=pkg.version%>_' + Date.now() + '.zip'
             },
-            testsCoverage:{
-                compression:'DEFLATE',
+            testsCoverage: {
+                compression: 'DEFLATE',
                 src: [
                     'coverage/Chrome */**'
                 ],
-                dest:'build/coverage.zip'
+                dest: 'build/coverage.zip'
             }
         }
     });
@@ -43,8 +50,12 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-zip');
     grunt.loadNpmTasks('grunt-karma');
+    grunt.loadNpmTasks('grunt-bower-task');
+
 
     // Default task(s).
-    grunt.registerTask('default', ['clean', 'zip']);
+    grunt.registerTask('default', ['clean', 'karma', 'zip']);
+
+    grunt.registerTask("ci", ['clean', 'bower','karma', 'zip'])
 
 };
