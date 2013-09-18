@@ -3,6 +3,19 @@ function initializeExtension(runtime, extension, $document) {
     var externalPorts = {};
 
 
+    function portDisconnected(targetId, disconnectedPort) {
+        [ports, externalPorts].forEach(function (portsMap) {
+            var port = portsMap[targetId];
+            if (!port) {
+                return;
+            }
+            if (port !== disconnectedPort) {
+                port.disconnect();
+            }
+            delete portsMap[targetId];
+        });
+    }
+
     extension.onConnect.addListener(function (port) {
         if (port.name && !ports[port.name]) {
             ports[port.name] = port;
@@ -54,11 +67,8 @@ function initializeExtension(runtime, extension, $document) {
             }
         });
         port.onDisconnect.addListener(function () {
-            delete ports[port.name];
-            if (externalPorts[port.name]) {
-                externalPorts[port.name].disconnect();
-            }
-            console.log("Port Disconnected ");
+            console.log("Local Port for " + port.name + "Disconnected, disconnecting external port");
+            portDisconnected(port.name, port);
         });
 
     });
@@ -68,11 +78,8 @@ function initializeExtension(runtime, extension, $document) {
         console.log("External port connected from app " + senderId);
         if (ports[senderId]) {
             externalPort.onDisconnect.addListener(function () {
-                console.log("External port from app " + senderId + " disconnected");
-                delete externalPorts[senderId];
-                if (ports[senderId]) {
-                    ports[senderId].disconnect();
-                }
+                console.log("External port from app " + senderId + " disconnected, disconnecting local port");
+                portDisconnected(senderId, externalPort);
             });
             externalPort.onMessage.addListener(function (message) {
                 var port = ports[senderId];

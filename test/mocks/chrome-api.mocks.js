@@ -54,6 +54,10 @@ chrome.mocks = {
         event.hasListeners = function () {
             return event.listeners.length > 0;
         };
+        event.removeListener = function (target) {
+            event.listeners.splice(event.listeners.indexOf(target), 1);
+        };
+
 
         return event;
     },

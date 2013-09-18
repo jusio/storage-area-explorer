@@ -5,7 +5,7 @@ describe("Testing storage controller", function () {
     var rootScope;
     var windowMock;
 
-    var ctrl, scope;
+    var ctrl, scope, q;
     beforeEach(module("storageExplorer"));
 
     beforeEach(function () {
@@ -37,7 +37,7 @@ describe("Testing storage controller", function () {
         };
         prettyJsonMock = jasmine.createSpy("prettyJson");
         appContextMock = jasmine.createSpy("appContext").andCallFake(function () {
-            return {appId: "id", name: "name"};
+            return q.when({appId: "id", name: "name"});
         });
         clipboardMock = {};
         clipboardMock.put = jasmine.createSpy("put");
@@ -49,9 +49,10 @@ describe("Testing storage controller", function () {
         };
     });
 
-    beforeEach(inject(function ($rootScope, $controller) {
+    beforeEach(inject(function ($rootScope, $controller, $q) {
         scope = $rootScope.$new();
         rootScope = $rootScope;
+        q = $q;
         ctrl = $controller('StorageCtrl', {$scope: scope,
                 storage: storageMock,
                 prettyJson: prettyJsonMock,
@@ -62,11 +63,14 @@ describe("Testing storage controller", function () {
         )
     }));
 
+
+
     it("Should intialize properly", function () {
+        scope.$apply();
         rootScope.setType("local");
         expect(localStorageMock.getMeta).toHaveBeenCalled();
         expect(syncStorageMock.getMeta).toHaveBeenCalled();
-        scope.$apply();
+
         expect(localStorageMock.get).toHaveBeenCalled();
         expect(localStorageMock.getBytesInUse).toHaveBeenCalled();
         expect(syncStorageMock.getBytesInUse).toHaveBeenCalled();
@@ -83,7 +87,9 @@ describe("Testing storage controller", function () {
                 "unchangedKey": "unchangedValue"
             });
         });
+
         rootScope.$apply();
+
         rootScope.$broadcast("$storageChanged", {changes: {
             myKey: {},
             mySecondKey: {newValue: "newValue"},
@@ -130,6 +136,7 @@ describe("Testing storage controller", function () {
 
 
     it("should clear value and switch to add mode on add()", function () {
+        rootScope.$apply();
         scope.add();
         expect(rootScope.mode).toBe("add");
         expect(rootScope.editObject.value).toBe('');
@@ -146,8 +153,9 @@ describe("Testing storage controller", function () {
                 "array": []
             });
         });
-        scope.$apply();
+        rootScope.$apply();
         scope.edit("string");
+        scope.$apply();
         expect(rootScope.mode).toBe("edit");
         expect(rootScope.editObject.key).toBe("string");
         expect(prettyJsonMock).not.toHaveBeenCalled();

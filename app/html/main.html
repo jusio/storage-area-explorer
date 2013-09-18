@@ -1,4 +1,8 @@
-<div ng-controller="StorageCtrl" class="main">
+<div ng-show="mode =='error'">
+    <h1>Page doesn't have chrome.storage, editor is disable</h1>
+    <h1><a href="#" ng-click="reload()">Try to enable</a></h1>
+</div>
+<div ng-controller="StorageCtrl" class="main" ng-hide="mode=='error'">
     <div class="header">
         <ul class="nav nav-tabs">
             <li ng-class="{active:currentType == 'local'}" ng-click="setType('local')"><a>Local Storage Area
@@ -20,7 +24,8 @@
                     area is empty
                 </div>
             </a></li>
-            <a class="pull-right" href="/app/html/options.html" title="Options, Links and Other Stuff" target="_blank"><span class="glyphicon glyphicon-comment"></span></a>
+            <a class="pull-right" href="/app/html/options.html" title="Options, Links and Other Stuff"
+               target="_blank"><span class="glyphicon glyphicon-comment"></span></a>
         </ul>
 
     </div>
