@@ -39,6 +39,5 @@ describe("pretty json test", function () {
     });
 
     afterEach(function(){
-        resetChromeApi();
     })
 });

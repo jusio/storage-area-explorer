@@ -7,17 +7,9 @@ describe("Testing background extension script", function () {
     var port;
     var $document = {};
     var element;
-
+    var externalPort;
     beforeEach(function () {
-        resetChromeApi();
-        extension = {
-            onConnect: chrome.mocks.createEvent()
-        };
         port = chrome.mocks.createMockPort();
-        runtime = {
-            onMessage: chrome.mocks.createEvent(),
-            onMessageExternal: chrome.mocks.createEvent()
-        };
         $document = {
 
             body: {
@@ -35,15 +27,59 @@ describe("Testing background extension script", function () {
             }
 
         };
+        var mockChromeApi = chrome.mocks.mockChromeApi();
+        extension = mockChromeApi.extension;
+        runtime = mockChromeApi.runtime;
+        port.name = "unique";
+        externalPort = chrome.mocks.createMockPort(port.name);
         initializeExtension(runtime, extension, $document);
-
     });
 
 
     it("Should add proper listeners", function () {
         expect(runtime.onMessage.listeners.length).toBe(1);
-        expect(runtime.onMessageExternal.listeners.length).toBe(1);
+        expect(extension.onConnectExternal.listeners.length).toBe(1);
         expect(extension.onConnect.listeners.length).toBe(1);
+    });
+
+    it("should post message on port when connected", function () {
+        port.name = "uniquePort";
+        extension.onConnect(port);
+        expect(port.postMessage).toHaveBeenCalledWith("portConnected")
+    });
+
+    it("should disconnect external port when local port is disconnected", function () {
+        extension.onConnect(port);
+        extension.onConnectExternal(externalPort);
+        port.onDisconnect();
+        expect(externalPort.disconnect).toHaveBeenCalled();
+    });
+
+
+    it("should disconnect local port when external port is disconnected", function () {
+        extension.onConnect(port);
+        extension.onConnectExternal(externalPort);
+        externalPort.onDisconnect();
+        expect(port.disconnect).toHaveBeenCalled();
+    });
+
+    it("should disconnect local port if message received before external port is connected", function () {
+        extension.onConnect(port);
+        try {
+            port.onMessage("message");
+        } catch (e) {
+
+        }
+        expect(port.disconnect).toHaveBeenCalled();
+    });
+
+
+    it("should pass messages from external port to local", function () {
+        extension.onConnect(port);
+        extension.onConnectExternal(externalPort);
+        port.postMessage = jasmine.createSpy();
+        externalPort.onMessage("message");
+        expect(port.postMessage).toHaveBeenCalled();
     });
 
     it("Should correctly listen on port", function () {
@@ -54,6 +90,7 @@ describe("Testing background extension script", function () {
     });
     it("Should throw error when port doesn't have a name", function () {
         var exception;
+        delete port.name;
         try {
             extension.onConnect(port);
         } catch (e) {
@@ -62,7 +99,6 @@ describe("Testing background extension script", function () {
         expect(exception).toBeDefined();
     });
     it("Should throw error when there are more than two ports with the same name", function () {
-        port.name = "test";
         extension.onConnect(port);
         var exception;
         try {
@@ -74,21 +110,12 @@ describe("Testing background extension script", function () {
     });
 
     it("Should delete disconnected ports", function () {
-        port.name = "test";
         extension.onConnect(port);
         port.onDisconnect();
         extension.onConnect(port); //should throw exception otherwise
     });
 
     it("Should delegate message to correct port", function () {
-        var exception;
-        try {
-            runtime.onMessageExternal(null, {});
-        } catch (e) {
-            exception = e;
-        }
-        expect(exception).toBeDefined();
-
         port.name = "uniquePort";
         port.postMessage = jasmine.createSpy("port.postMessage");
         extension.onConnect(port);
@@ -105,13 +132,23 @@ describe("Testing background extension script", function () {
         expect(anotherPort.postMessage).toHaveBeenCalled();
     });
 
-    it("Should delegate messages from port to the runtime", function () {
+    it("Should disconnect external port if it is not expected", function () {
+        var mockPort = chrome.mocks.createMockPort();
+        extension.onConnectExternal(mockPort);
+        expect(mockPort.disconnect).toHaveBeenCalled();
+    });
+
+
+    it("Should delegate messages from port to the externalPort", function () {
         port.name = "uniquePort";
         extension.onConnect(port);
-        runtime.sendMessage = jasmine.createSpy("runtime.sendMessage");
+        var externalPort = chrome.mocks.createMockPort(port.name);
+        extension.onConnectExternal(externalPort);
+        expect(port.disconnect).not.toHaveBeenCalled();
+        expect(externalPort.disconnect).not.toHaveBeenCalled();
         var message = {target: port.name};
         port.onMessage(message);
-        expect(runtime.sendMessage).toHaveBeenCalledWith(port.name, message);
+        expect(externalPort.postMessage).toHaveBeenCalledWith(message);
     });
 
     it("Should support 'copy' action message", function () {

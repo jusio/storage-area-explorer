@@ -7,7 +7,9 @@ describe("Test storage", function () {
     var q;
     var rootScope;
     var usedPort;
+    var chromeApiMock;
     beforeEach(module("storageExplorer"));
+
 
     beforeEach(function () {
         delegateStorageMock = jasmine.createSpy("delegateStorageMock").andCallFake(function (promise, type) {
@@ -24,20 +26,21 @@ describe("Test storage", function () {
             rootScope.$apply();
             return deferred.promise;
         });
-        runtimeMock = {
-            onMessageExternal: chrome.mocks.createEvent(),
-            connect: jasmine.createSpy("runtime.connect mock").andCallFake(function () {
-                usedPort = chrome.mocks.createMockPort();
-                spyOn(usedPort.onMessage, 'addListener').andCallThrough();
-                return usedPort;
-            }),
-            id: "APP_ID"
-        };
         evalServiceMock = {
             evalFunction: function () {
 
             }
-        }
+        };
+        chromeApiMock = chrome.mocks.mockChromeApi();
+        runtimeMock = chromeApiMock.runtime;
+        runtimeMock.id = "APP_ID";
+        runtimeMock.connect = jasmine.createSpy("testSpy").andCallFake(function () {
+            usedPort = chrome.mocks.createMockPort();
+            spyOn(usedPort.onMessage, 'addListener').andCallThrough();
+            return usedPort;
+        });
+        console.log("created runtime mock");
+
     });
 
     beforeEach(module(function ($provide) {
@@ -78,7 +81,9 @@ describe("Test storage", function () {
         expect(usedPort.onMessage.addListener).toHaveBeenCalled();
         expect(usedPort).toBeDefined();
         expect(callback).toHaveBeenCalled();
+        expect(usedPort.onDisconnect.hasListeners()).toBeTruthy();
     });
+
 
     it("Should spawn angular messages on port messages", function () {
         rootScope.$apply();
@@ -100,73 +105,85 @@ describe("Test storage", function () {
         expect(callback).not.toHaveBeenCalled();
     });
 
-    it("Inject script should be working correctly", function () {
-        var chromeMock = {
-            runtime: {
-                onMessageExternal: chrome.mocks.createEvent(),
-                id: "APP_ID"
-            },
-            storage: {
-                onChanged: chrome.mocks.createEvent(),
-                local: {
-                    'clear': jasmine.createSpy("storage.local.clear").andCallFake(function (callback) {
-                        callback("result");
-                    }),
-                    "META_FLAG": 120
-                }
-            }
-        };
-        spyOn(evalServiceMock, 'evalFunction').andCallFake(function (closure, params) {
-            console.log(params);
-
-            expect(params['APP_ID']).toBe("APP_ID");
-            closure(chromeMock);
-        });
-
-        rootScope.$apply();
-        var runtime = chromeMock.runtime;
-        expect(runtime.onMessageExternal.listeners.length).toBe(1);
-        var storage = chromeMock.storage;
-        expect(storage.onChanged.listeners.length).toBe(1);
-        runtime.sendMessage = jasmine.createSpy("sendMessage").andCallFake(function (targetId, message) {
-            expect(targetId).toBe("APP_ID");
-            expect(message.change).toBe(true);
-            expect(message.changes).toBe("changes");
-            expect(message.type).toBe("name");
-        });
-        storage.onChanged("changes", "name");
-        expect(runtime.sendMessage).toHaveBeenCalled();
-        runtime.sendMessage = jasmine.createSpy("sendMessage").andCallFake(function (targetId, message) {
-            expect(targetId).toBe("APP_ID");
-            expect(message.results.length).toBe(1);
-            expect(message.results[0]).toBe("result");
-            expect(message.meta['META_FLAG']).toBe(chromeMock.storage.local.META_FLAG);
-        });
-        runtime.onMessageExternal({target: 'APP_ID', method: "clear", type: 'local'}, {id: 'APP_ID'});
-        expect(runtime.sendMessage).toHaveBeenCalled();
-        expect(storage.local.clear).toHaveBeenCalled();
+    it("", function () {
+        describe("Inject script should be working correctly", function () {
 
 
-        runtime.sendMessage = jasmine.createSpy("runtime.sendMessage");
-        runtime.onMessageExternal({}, {id: "APP_ID"});
-        expect(runtime.sendMessage).not.toHaveBeenCalled();
-        runtime.onMessageExternal({target: "APP_ID"}, {});
-        expect(runtime.sendMessage).not.toHaveBeenCalled();
-        storage.local.clear = jasmine.createSpy("storage.local.clear").andCallFake(function (arg, callback) {
-            expect(arg).toBe("arg1");
-            callback("result");
-        });
-        runtime.sendMessage = jasmine.createSpy("runtime.sendMessage").andCallFake(function (targetId, message) {
-            expect(targetId).toBe("APP_ID");
-            expect(message.results.length).toBe(1);
-            expect(message.results[0]).toBe("result");
-            expect(message.meta['META_FLAG']).toBe(chromeMock.storage.local.META_FLAG);
-        });
-        runtime.onMessageExternal({target: 'APP_ID', method: "clear", args: ["arg1"], type: 'local'}, {id: 'APP_ID'});
-        expect(runtime.sendMessage).toHaveBeenCalled();
-        expect(storage.local.clear).toHaveBeenCalled();
+            //TODO split into separate test suite, way too hard to maintain
+            var mockPort = chrome.mocks.createMockPort("APP_ID");
+            mockPort.name = "Unique port";
+            var extensionMock = chromeApiMock.extension;
+
+            extensionMock.connect.andCallFake(function () {
+                return mockPort;
+            });
+            extensionMock.id = "APP_ID";
+            chromeApiMock.storage.local.clear.andCallFake(function (callback) {
+                callback("result");
+            });
+            chromeApiMock.storage.local.META_FLAG = 120;
 
 
+            spyOn(evalServiceMock, 'evalFunction').andCallFake(function (closure, params) {
+                expect(params['APP_ID']).toBe("APP_ID");
+                closure(chromeApiMock);
+            });
+
+            rootScope.$apply();
+            var storage = chromeApiMock.storage;
+            it("should connect to extension and listen for messages on port and storage", function () {
+                expect(extensionMock.connect).toHaveBeenCalled();
+                expect(mockPort.onMessage.hasListeners()).toBe(true);
+                expect(storage.onChanged.hasListeners()).toBe(true);
+            });
+
+            it("should transmit storage changes to the port", function () {
+                mockPort.postMessage = jasmine.createSpy("mockPort.postMessage").andCallFake(function (message) {
+                    expect(message.changes).toBe("changes");
+                    expect(message.type).toBe("name");
+                    expect(message.change).toBeTruthy();
+                });
+                storage.onChanged("changes", "name");
+                expect(mockPort.postMessage).toHaveBeenCalled();
+
+            });
+
+
+            it("on message with method prop should call postmessage", function () {
+                mockPort.postMessage = jasmine.createSpy("mockPort.postMessage").andCallFake(function (message) {
+                    expect(message.results.length).toBe(1);
+                    expect(message.results[0]).toBe("result");
+                    expect(message.meta['META_FLAG']).toBe(chromeApiMock.storage.local.META_FLAG);
+                });
+                mockPort.onMessage({target: 'APP_ID', method: "clear", type: 'local'});
+                expect(mockPort.postMessage).toHaveBeenCalled();
+                expect(storage.local.clear).toHaveBeenCalled();
+            });
+
+            it("should ignore empty messages and messages without method & type properties",function(){
+                mockPort.postMessage = jasmine.createSpy("mockPort.postMessage");
+                mockPort.onMessage({});
+                expect(mockPort.postMessage).not.toHaveBeenCalled();
+                mockPort.onMessage({target: "APP_ID"});
+                expect(mockPort.postMessage).not.toHaveBeenCalled();
+            });
+
+            it("should correctly apply arguments to the storage",function(){
+                storage.local.clear = jasmine.createSpy("storage.local.clear").andCallFake(function (arg, callback) {
+                    expect(arg).toBe("arg1");
+                    callback("result");
+                });
+                mockPort.postMessage = jasmine.createSpy("mockPort.postMessage").andCallFake(function (message) {
+                    expect(message.results.length).toBe(1);
+                    expect(message.results[0]).toBe("result");
+                    expect(message.meta['META_FLAG']).toBe(chromeApiMock.storage.local.META_FLAG);
+                });
+                mockPort.onMessage({target: 'APP_ID', method: "clear", args: ["arg1"], type: 'local'});
+                expect(mockPort.postMessage).toHaveBeenCalled();
+                expect(storage.local.clear).toHaveBeenCalled();
+            })
+
+        })
     });
 
 });

@@ -3,7 +3,9 @@ describe("Testing appContext Service", function () {
     var injector;
     var evalService = {};
     var q;
+    var chromeApi;
     beforeEach(function () {
+        chromeApi = chrome.mocks.mockChromeApi();
         module("storageExplorer");
         evalService.evalFunction = jasmine.createSpy().andCallFake(function () {
             var defer = q.defer();
@@ -11,7 +13,9 @@ describe("Testing appContext Service", function () {
             return defer.promise;
         });
         module(function ($provide) {
+
             $provide.value("evalService", evalService);
+
         });
         inject(function ($injector, $q) {
             injector = $injector;
@@ -46,10 +50,10 @@ describe("Testing appContext Service", function () {
     });
 
     it("On evalService.evalFunction fail should call promise reject", function () {
-        chrome.runtime.getManifest =function(){};
+
         evalService.evalFunction = function (fnc) {
             var defer = q.defer();
-                fnc(chrome);
+                fnc(chromeApi);
             defer.reject();
             return defer.promise;
         };

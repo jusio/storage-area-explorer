@@ -1,37 +1,39 @@
-function resetChromeApi() {
-
+function getChromeApiMock(mocks) {
+    var chrome = {};
     chrome.runtime = {
-        sendMessage: function () {
-
-        },
-        onMessage: {
-            addListener: function () {
-            }
-        },
-        onMessageExternal: {
-            addListener: function () {
-            }
-        }
-
+        sendMessage: jasmine.createSpy("runtime.sendMessage"),
+        onMessage: mocks.createEvent(),
+        onMessageExternal: mocks.createEvent(),
+        connect: jasmine.createSpy("runtime.connect").andCallFake(function () {
+            return mocks.createMockPort();
+        }),
+        getManifest: jasmine.createSpy("runtime.getManifest")
     };
     chrome.devtools = {
         inspectedWindow: {
-            "eval": function () {
-
-            }
+            "eval": jasmine.createSpy("devtools.inspectedWindow.eval")
         }
     };
-
-
     chrome.extension = {
-        onConnect: {
-            addListener: function () {
-            }
-        }
-
+        onConnect: mocks.createEvent(),
+        onConnectExternal: mocks.createEvent(),
+        connect: jasmine.createSpy("extension.connect").andCallFake(function () {
+            return mocks.createMockPort();
+        })
     };
+    chrome.runtime.onConnectExternal = chrome.extension.onConnectExternal = mocks.createEvent();
+
+    chrome.storage = {};
+    chrome.storage.onChanged = mocks.createEvent();
+    ['local', 'managed', 'sync'].forEach(function (storageName) {
+        var area = chrome.storage[storageName] = {};
+        ['set', 'remove', 'clear', 'get', 'getBytesInUse'].forEach(function (methodName) {
+            area[methodName] = jasmine.createSpy("storage." + storageName + "." + methodName);
+        });
+    });
+
+    return chrome;
 }
-resetChromeApi();
 
 chrome.mocks = {
     createEvent: function () {
@@ -49,20 +51,25 @@ chrome.mocks = {
         event.addListener = function () {
             event.listeners.push(arguments[0]);
         };
+        event.hasListeners = function () {
+            return event.listeners.length > 0;
+        };
 
         return event;
     },
 
-    createMockPort: function createMockPort() {
+    createMockPort: function createMockPort(id) {
+
         return {
+            sender: {id: id},
             onMessage: chrome.mocks.createEvent(),
             onDisconnect: chrome.mocks.createEvent(),
-            postMessage:function(){
-
-            },
-            disconnect:function(){
+            postMessage: jasmine.createSpy("port.postMessage"),
+            disconnect: jasmine.createSpy("port.disconnect").andCallFake(function () {
                 this.onDisconnect();
-            }
+            })
         };
     }
+
 };
+chrome.mocks.mockChromeApi = getChromeApiMock.bind(null, chrome.mocks);
