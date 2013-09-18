@@ -3,6 +3,7 @@ function initializeDevtoolsPage(panels, inspectedWindow) {
 
     inspectedWindow.eval("!!chrome.runtime && chrome.runtime.getManifest()", function (manifest) {
         if (!!manifest.permissions && manifest.permissions.indexOf("storage") > -1) {
+            alert("Creating page");
             panels.create(
                 "Storage Explorer",
                 "img/angular.png",
@@ -10,7 +11,7 @@ function initializeDevtoolsPage(panels, inspectedWindow) {
         }
     });
 }
-if (chrome.devtools && chrome.devtools.panesl && chrome.devtools.inspectedWindow) {
+if (chrome.devtools && chrome.devtools.panels && chrome.devtools.inspectedWindow) {
     initializeDevtoolsPage(chrome.devtools.panels, chrome.devtools.inspectedWindow);
 }
 
