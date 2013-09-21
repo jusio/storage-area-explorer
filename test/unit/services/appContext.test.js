@@ -38,7 +38,7 @@ describe("Testing appContext Service", function () {
         expect(evalService.evalFunction).toHaveBeenCalled();
     });
 
-    it("On evalService.evalFunction fail should call promise reject", function () {
+    it("should call promise reject evalService.evalFunction fail should ", function () {
         evalService.evalFunction = jasmine.createSpy("evalFunction").andCallFake(function (fnc) {
             var defer = q.defer();
             fnc(chromeApi);
@@ -51,6 +51,5 @@ describe("Testing appContext Service", function () {
         injector.get('$rootScope').$apply();
         expect(errorCallback).toHaveBeenCalled();
     });
-
 
 });
