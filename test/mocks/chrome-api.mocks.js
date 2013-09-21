@@ -7,7 +7,12 @@ function getChromeApiMock(mocks) {
         connect: jasmine.createSpy("runtime.connect").andCallFake(function () {
             return mocks.createMockPort();
         }),
-        getManifest: jasmine.createSpy("runtime.getManifest")
+        getManifest: jasmine.createSpy("runtime.getManifest").andCallFake(function () {
+            return {
+                permissions: ["storage"],
+                optional_permissions: []
+            };
+        })
     };
     chrome.devtools = {
         inspectedWindow: {
