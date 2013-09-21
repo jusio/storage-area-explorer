@@ -1,7 +1,11 @@
 angular.module("storageExplorer").factory("appContext", function ($q, $rootScope, evalService) {
     return function () {
         return evalService.evalFunction(function (chrome) {
-            return {id: chrome.runtime.id, manifest: chrome.runtime.getManifest()};
+            var manifest = chrome.runtime.getManifest();
+            if (manifest.permissions.indexOf("storage") === -1 && manifest["optional_permissions"].indexOf("storage") === -1) {
+                throw new Error();
+            }
+            return {id: chrome.runtime.id, manifest: manifest};
         }).then(function (result) {
                 var info = {
                     id: result.id,
