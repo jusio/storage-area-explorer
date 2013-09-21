@@ -51,6 +51,7 @@ table tbody tr.list-row td {
 table thead tr.list-row th {
     padding: 4px 4px 4px 16px;
 }
+
 th {
     text-align: left;
 }
@@ -116,5 +117,10 @@ th {
 }
 .usage {
     font-size: 10px;
+}
+
+.explorer-disabled {
+    padding-top: 20px;
+    padding-left: 10%;
 }
 

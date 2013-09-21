@@ -1,6 +1,6 @@
-<div ng-show="mode =='error'">
-    <h1>Page doesn't have chrome.storage, editor is disable</h1>
-    <h1><a href="#" ng-click="reload()">Try to enable</a></h1>
+<div ng-show="mode =='error'" class="explorer-disabled">
+    <h3>Explorer is disabled on normal web pages or extensions without storage permission </h3>
+    <h3><a href="#" ng-click="reload()">Refresh</a></h3>
 </div>
 <div ng-controller="StorageCtrl" class="main" ng-hide="mode=='error'">
     <div class="header">
