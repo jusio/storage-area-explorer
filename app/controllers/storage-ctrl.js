@@ -1,13 +1,13 @@
 angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $rootScope, storage, prettyJson, $window, $timeout, appContext) {
     var rawData;
     $scope.results = [];
+    $rootScope.editObject = {};
     appContext().then(function () {
         $rootScope.mode = 'list';
         $rootScope.currentType = 'local';
         $rootScope.setType = function (type) {
             $rootScope.currentType = type;
         };
-        $rootScope.editObject = {};
         $scope.stats = {
             local: {},
             sync: {}
