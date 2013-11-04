@@ -36,10 +36,13 @@ module.exports = function (config) {
 
         // test results reporter to use
         // possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
-        reporters: ['dots', 'coverage'],
+        reporters: ['dots', 'junit' ,'coverage'],
         coverageReporter: {
-            type: 'html',
+            type: 'cobertura',
             dir: 'coverage/'
+        },
+        junitReporter: {
+            outputFile: 'coverage/test-results.xml'
         },
 
         // web server port
