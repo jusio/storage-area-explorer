@@ -12,7 +12,8 @@
     "grunt-contrib-clean": "~0.5.0",
     "grunt-zip": "~0.9.2",
     "karma-coverage": "~0.1.0",
-    "grunt-bower-task": "~0.3.2"
+    "grunt-bower-task": "~0.3.2",
+    "karma-junit-reporter": "~0.1"
   },
   "scripts": {
     "test": "grunt ci"
