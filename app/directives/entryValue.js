@@ -6,7 +6,7 @@ angular.module("storageExplorer").directive("entryValue", function ($compile) {
         return string;
     }
 
-    var stringTemplate = '<span class="quote">"</span><span class="string">{{displayedValue}}</span><span class="quote">"</span>';
+    var stringTemplate = '<span class="string">{{displayedValue}}</span>';
     var booleanTemplate = '<span class="boolean">{{displayedValue}}</span>';
     var numberTemplate = '<span class="number">{{displayedValue}}</span>';
     var objectTemplate = '<span class="bracket">{</span><span class="object">{{displayedValue}}</span><span class="bracket">}</span>';
@@ -33,7 +33,7 @@ angular.module("storageExplorer").directive("entryValue", function ($compile) {
 
     function string(value) {
 
-        return stringTemplate.replace('{{displayedValue}}', checkWidth(escape(value)));
+        return stringTemplate.replace('{{displayedValue}}', checkWidth(escape(JSON.stringify(value))));
     }
 
     function bool(value) {
