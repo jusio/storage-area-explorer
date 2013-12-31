@@ -39,7 +39,6 @@ describe("Test storage", function () {
             spyOn(usedPort.onMessage, 'addListener').andCallThrough();
             return usedPort;
         });
-        console.log("created runtime mock");
 
     });
 

@@ -25,7 +25,7 @@ function initializeExtension(runtime, extension, $document) {
                 });
             }
             port.postMessage("portConnected");
-            console.log("Local port " + port.name + " connected");
+            console.debug("Local port " + port.name + " connected");
         } else {
             port.disconnect();
             throw new Error("Trying to register port for extension which is already existing. Extension id " + port.name);
@@ -67,7 +67,7 @@ function initializeExtension(runtime, extension, $document) {
             }
         });
         port.onDisconnect.addListener(function () {
-            console.log("Local Port for " + port.name + "Disconnected, disconnecting external port");
+            console.debug("Local Port for " + port.name + "Disconnected, disconnecting external port");
             portDisconnected(port.name, port);
         });
 
@@ -75,10 +75,10 @@ function initializeExtension(runtime, extension, $document) {
 
     extension.onConnectExternal.addListener(function (externalPort) {
         var senderId = externalPort.sender.id;
-        console.log("External port connected from app " + senderId);
+        console.debug("External port connected from app " + senderId);
         if (ports[senderId]) {
             externalPort.onDisconnect.addListener(function () {
-                console.log("External port from app " + senderId + " disconnected, disconnecting local port");
+                console.debug("External port from app " + senderId + " disconnected, disconnecting local port");
                 portDisconnected(senderId, externalPort);
             });
             externalPort.onMessage.addListener(function (message) {
@@ -108,13 +108,14 @@ function initializeExtension(runtime, extension, $document) {
         }
         if (message.action === 'paste') {
             area.select();
-            $document.execCommand("paste");
+            //noinspection JSCheckFunctionSignatures
+            $document.execCommand('paste');
             response && response(area.value);
             area.value = '';
         }
     });
 
-    var area = $document.createElement("textarea");
+    var area = $document.createElement('textarea');
     $document.body.appendChild(area);
 
 }

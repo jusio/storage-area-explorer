@@ -38,7 +38,7 @@ module.exports = function (config) {
         // possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
         reporters: ['dots', 'junit' ,'coverage'],
         coverageReporter: {
-            type: 'cobertura',
+            type: 'html',
             dir: 'coverage/'
         },
         junitReporter: {

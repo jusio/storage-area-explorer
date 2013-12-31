@@ -34,13 +34,11 @@ describe("Testing evalService", function () {
         _devtools.inspectedWindow.eval = function (input, fnc) {
             fnc(expectedResult);
             inputString = input;
-            console.log(fnc)
         };
         var obtainedResult;
         _evalService.evalFunction("").then(function (result) {
             obtainedResult = result;
         }, function () {
-            console.log("Error");
         });
         rootScope.$apply();
         expect(inputString).toBe("()(chrome)");

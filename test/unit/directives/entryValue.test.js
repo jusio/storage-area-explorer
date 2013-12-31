@@ -81,7 +81,6 @@ describe("Entry value directive test", function () {
         scope.$digest();
         elem.dblclick();
         var find = elem.find("input[type=text]")[0];
-        console.log(elem.find("input[type=text]"));
         expect(find).toBeDefined();
         expect(find.value).toBe('"valueToEdit"');
     });
