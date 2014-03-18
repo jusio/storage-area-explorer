@@ -3,22 +3,24 @@ angular.module("storageExplorer").value("extensionPageInject", function (chrome)
     var port = chrome.runtime.connect(from);
     var storages = {};
     try {
-        port.onDisconnect.addListener(function () {
-            chrome.storage.onChanged.removeListener(storageListener);
-        });
+        if (chrome.storage) {
+            port.onDisconnect.addListener(function () {
+                chrome.storage.onChanged.removeListener(storageListener);
+            });
 
-        var storageListener = function (changes, name) {
-            port.postMessage({change: true, changes: changes, type: name});
-        };
-        chrome.storage.onChanged.addListener(storageListener);
-        storages['sync'] = chrome.storage.sync;
-        storages['local'] = chrome.storage.local;
-        storages['managed'] = chrome.storage.managed;
+            var storageListener = function (changes, name) {
+                port.postMessage({change: true, changes: changes, type: name});
+            };
+            chrome.storage.onChanged.addListener(storageListener);
+            storages['sync'] = chrome.storage.sync;
+            storages['local'] = chrome.storage.local;
+            storages['managed'] = chrome.storage.managed;
+        }
     } catch (e) {
 
     }
 
-    try{
+    try {
 
         storages['localStorage'] = new StorageArea(window.localStorage);
         storages['sessionStorage'] = new StorageArea(window.sessionStorage);
@@ -126,10 +128,9 @@ angular.module("storageExplorer").value("extensionPageInject", function (chrome)
         port.onDisconnect.addListener(function () {
             document.documentElement.removeChild(frame);
         })
-    } catch(e) {
+    } catch (e) {
 
     }
-
 
 
     port.onMessage.addListener(function (message) {

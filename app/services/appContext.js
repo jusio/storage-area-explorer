@@ -16,7 +16,7 @@ angular.module("storageExplorer").factory("appContext", function ($q, $rootScope
                 }
 
             } catch (e) {
-                console.log("Error chrome api ", e);
+//                console.log("Error chrome api ", e);
             }
             try {
                 if (window.localStorage) {
@@ -27,9 +27,9 @@ angular.module("storageExplorer").factory("appContext", function ($q, $rootScope
                 }
 
             } catch (e) {
-                console.log("Error storage api",e);
+//                console.log("Error storage api",e);
             }
-            console.log("Almost finished",returnValue);
+//            console.log("Almost finished", returnValue);
             return returnValue;
         }).then(function (result) {
             try{

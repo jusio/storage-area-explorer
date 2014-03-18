@@ -73,6 +73,9 @@ angular.module("storageExplorer").factory("storage", function ($q, $rootScope, a
             if (!appInfo.id && appInfo.tabId) {
                 remoteId = "for_tab_" + appInfo.tabId;
             }
+            if(appInfo.id && appInfo.tabId){
+                remoteId = appInfo.id + "_" + appInfo.tabId;
+            }
 
 
             port = runtime.connect({name: remoteId});

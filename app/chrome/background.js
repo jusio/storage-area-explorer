@@ -170,7 +170,12 @@ function initializeExtension(runtime, extension, $document, tabs) {
             portManager.trackTargetPort(undefined, port.sender.tab.id, port);
         } else {
             console.log("Another port connected", port);
-            portManager.trackUiPort(port.name, undefined, port);
+            if(port.name.indexOf("_")< 0) {
+                portManager.trackUiPort(port.name, undefined, port);
+            } else {
+               var names = port.name.split("_");
+                portManager.trackUiPort(names[0], names[1], port);
+            }
             port.postMessage("portConnected");
         }
     });
@@ -179,7 +184,7 @@ function initializeExtension(runtime, extension, $document, tabs) {
     //only invoked by chrome apps
     extension.onConnectExternal.addListener(function (externalPort) {
         var appName = externalPort.sender.id;
-        var tabId = externalPort.tab ? externalPort.sender.tab.id : undefined;
+        var tabId = externalPort.sender.tab ? externalPort.sender.tab.id : undefined;
 
         if (portManager.getUiPort(appName, tabId)) {
             portManager.trackTargetPort(appName, tabId, externalPort)
