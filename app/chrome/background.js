@@ -21,9 +21,10 @@ function initializeExtension(runtime, extension, $document, tabs) {
     function clearTabsPorts(tabPortName, portInstance){
         var otherName;
         if(tabPortName.indexOf("for_tab_") > -1){
-           otherName = "inspected_window_" + tabPortName.substring("for_tab_".length);
-        } else if (tabPortName == "inspected_window_") {
+           otherName = "inspected_tab_" + tabPortName.substring("for_tab_".length);
+        } else if (tabPortName == "inspected_tab_") {
             tabPortName = tabPortName + portInstance.sender.tab.id;
+            otherName = "for_tab_" + portInstance.sender.tab.id;
         }
         [tabPortName,otherName].forEach(function(name){
             var portToDisconnect = ports[name];

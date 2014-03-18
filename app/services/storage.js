@@ -87,7 +87,7 @@ angular.module("storageExplorer").factory("storage", function ($q, $rootScope, a
 
             });
             port.onDisconnect.addListener(function () {
-//                window.location.reload();
+                window.location.reload();
             });
 
         });
