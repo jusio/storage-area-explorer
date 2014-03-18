@@ -4,133 +4,115 @@
     }
     var extension = chrome.extension;
     var storages = {};
-    var port = extension.connect({name:"inspected_tab_"});
-    try {
-        storages['localStorage'] = new StorageArea(window.localStorage);
-        storages['sessionStorage'] = new StorageArea(window.sessionStorage);
-        function StorageChange(oldValue, newValue) {
-            this.oldValue = oldValue;
-            this.newValue = newValue;
+    var port = extension.connect({name: "inspected_tab_"});
+
+    storages['localStorage'] = new StorageArea(window.localStorage);
+    storages['sessionStorage'] = new StorageArea(window.sessionStorage);
+    function StorageChange(oldValue, newValue) {
+        this.oldValue = oldValue;
+        this.newValue = newValue;
+    }
+
+    function StorageArea(storage) {
+        this.storage = storage;
+    }
+
+    function applyFunctorPerItem(items, functor) {
+        if (typeof items === 'string') {
+            functor(items);
         }
-
-        function StorageArea(storage) {
-            this.storage = storage;
-        }
-
-        function applyFunctorPerItem(items, functor) {
-            if (typeof items === 'string') {
-                functor(items);
-            }
-            if (typeof items === 'object') {
-                if (Object.prototype.toString.call(items) === '[object Array]') {
-                    items.forEach(function (val) {
-                        functor(items[val]);
-                    })
-                } else {
-                    for (var key in items) {
-                        if (items.hasOwnProperty(key)) {
-                            functor(key, items[key]);
-                        }
-                    }
-                }
-            }
-
-        }
-
-        StorageArea.prototype.get = function (items, callback) {
-            if(typeof items === 'function'){
-                callback = items;
-                items = null;
-            }
-            var returnItems = {};
-            var storage = this.storage;
-            if (items === null || items === undefined) {
-                for (var i = 0; i < storage.length; i++) {
-                    var key2 = storage.key(i);
-                    returnItems[key2] = storage.getItem(key2);
-                }
+        if (typeof items === 'object') {
+            if (Object.prototype.toString.call(items) === '[object Array]') {
+                items.forEach(function (val) {
+                    functor(items[val]);
+                })
             } else {
-                applyFunctorPerItem(items, function (key) {
-                    var storedItem = storage.getItem(key);
-                    if (arguments.length === 2 && storedItem === null) {
-                        storedItem = arguments[1];
+                for (var key in items) {
+                    if (items.hasOwnProperty(key)) {
+                        functor(key, items[key]);
                     }
-                    returnItems[key] = storedItem;
-                });
+                }
             }
+        }
 
-            callback && callback(returnItems);
-        };
+    }
 
-        StorageArea.prototype.set = function (items, callback) {
-            if(typeof items === 'function'){
-                callback = items;
-                items = null;
+    StorageArea.prototype.get = function (items, callback) {
+        if (typeof items === 'function') {
+            callback = items;
+            items = null;
+        }
+        var returnItems = {};
+        var storage = this.storage;
+        if (items === null || items === undefined) {
+            for (var i = 0; i < storage.length; i++) {
+                var key2 = storage.key(i);
+                returnItems[key2] = storage.getItem(key2);
             }
-            var storage = this.storage;
-            applyFunctorPerItem(items, function (key, value) {
-                storage.setItem(key, value);
-            });
-            callback && callback();
-        };
-
-        StorageArea.prototype.remove = function (items, callback) {
-            if(typeof items === 'function'){
-                callback = items;
-                items = null;
-            }
-            var storage = this.storage;
+        } else {
             applyFunctorPerItem(items, function (key) {
-                storage.removeItem(key);
+                var storedItem = storage.getItem(key);
+                if (arguments.length === 2 && storedItem === null) {
+                    storedItem = arguments[1];
+                }
+                returnItems[key] = storedItem;
             });
-            callback && callback();
-        };
+        }
 
-        StorageArea.prototype.clear = function (callback) {
-            this.storage.clear();
-            callback && callback();
-        };
+        callback && callback(returnItems);
+    };
 
-
-        var frame = document.createElement("iframe");
-        frame.style.display = 'none';
-        document.documentElement.appendChild(frame);
-        frame.contentWindow.addEventListener("storage", function (event) {
-            var type = "";
-            if (event.storageArea === event.currentTarget.localStorage) {
-                type = "localStorage";
-            } else if (event.storageArea === event.currentTarget.sessionStorage) {
-                type = "sessionStorage"
-            } else {
-                console.log("Unknown storage area");
-                return;
-            }
-            var changes = {};
-            changes[event.key] = {newValue:event.newValue};
-            port.postMessage({change: true, type: type, changes: changes});
+    StorageArea.prototype.set = function (items, callback) {
+        if (typeof items === 'function') {
+            callback = items;
+            items = null;
+        }
+        var storage = this.storage;
+        applyFunctorPerItem(items, function (key, value) {
+            storage.setItem(key, value);
         });
-        port.onDisconnect.addListener(function(){
-            document.documentElement.removeChild(frame);
-        })
-    } catch (e) {
-        console.log("No local storage", e);
-    }
-    try {
-        storages['sync'] = chrome.storage.sync;
-        storages['local'] = chrome.storage.local;
-        storages['managed'] = chrome.storage.managed;
-        var storageListener = function (changes, name) {
-            port.postMessage({change: true, changes: changes, type: name});
-        };
-        chrome.storage.onChanged.addListener(storageListener);
-        port.onDisconnect.addListener(function () {
-            if (chrome && chrome.storage) {
-                chrome.storage.onChanged.removeListener(storageListener);
-            }
+        callback && callback();
+    };
+
+    StorageArea.prototype.remove = function (items, callback) {
+        if (typeof items === 'function') {
+            callback = items;
+            items = null;
+        }
+        var storage = this.storage;
+        applyFunctorPerItem(items, function (key) {
+            storage.removeItem(key);
         });
-    } catch (e) {
-        console.log("No chrome.storage", e);
-    }
+        callback && callback();
+    };
+
+    StorageArea.prototype.clear = function (callback) {
+        this.storage.clear();
+        callback && callback();
+    };
+
+
+    var frame = document.createElement("iframe");
+    frame.style.display = 'none';
+    document.documentElement.appendChild(frame);
+    frame.contentWindow.addEventListener("storage", function (event) {
+        var type = "";
+        if (event.storageArea === event.currentTarget.localStorage) {
+            type = "localStorage";
+        } else if (event.storageArea === event.currentTarget.sessionStorage) {
+            type = "sessionStorage"
+        } else {
+            console.log("Unknown storage area");
+            return;
+        }
+        var changes = {};
+        changes[event.key] = {newValue: event.newValue};
+        port.postMessage({change: true, type: type, changes: changes});
+    });
+    port.onDisconnect.addListener(function () {
+        document.documentElement.removeChild(frame);
+    })
+
 
     port.onMessage.addListener(function (message) {
         if (!message.type || !storages[message.type]) {
