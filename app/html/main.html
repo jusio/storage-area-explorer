@@ -104,7 +104,7 @@
         <input id="key" class="key form-control" type="text"
                ng-model="editObject.key" placeholder="Name Of Key">
 
-        <span class="text-info" ng-if="!validation">Value in JSON format e.g. all the strings should be enclosed in double quotes: "example"</span>
+        <span class="text-info" ng-if="!currentDescriptor.stringOnly && !validation">Value in JSON format e.g. all the strings should be enclosed in double quotes: "example"</span>
         <span class="text-warning"
               ng-if="validation">Value is not valid JSON: {{validation}}</span>
 

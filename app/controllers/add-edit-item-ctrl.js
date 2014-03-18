@@ -2,6 +2,11 @@ angular.module("storageExplorer").controller("AddEditItemCtrl", function ($scope
 
 
     $rootScope.$watch('editObject', function () {
+        if($rootScope.currentDescriptor.stringOnly) {
+            $scope.validation = null;
+            return;
+        }
+
         if ($rootScope.editObject.value) {
             try {
                 angular.fromJson($rootScope.editObject.value);
@@ -20,7 +25,11 @@ angular.module("storageExplorer").controller("AddEditItemCtrl", function ($scope
     $scope.save = function () {
         var obj = {};
         var editObj = $rootScope.editObject;
-        obj[editObj.key] = JSON.parse(editObj.value);
+        if(!$rootScope.currentDescriptor.stringOnly) {
+            obj[editObj.key] = JSON.parse(editObj.value);
+        } else {
+            obj[editObj.key] = editObj.value;
+        }
         storage[$rootScope.currentType].set(obj, function () {
             $scope.cancel();
         });
