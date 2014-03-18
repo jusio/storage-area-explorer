@@ -105,18 +105,31 @@ angular.module("storageExplorer").directive("entryValue", function ($compile) {
         restrict: 'E',
         scope: {
             value: "=",
+            stringOnly:"=",
             key: "="
         },
         link: function (scope, element, attr) {
-            element.append(val(scope.value));
+            if(!scope.stringOnly){
+                element.append(val(scope.value));
+            } else {
+                element.text(scope.value);
+            }
             element.bind("dblclick", function () {
                 var editor = angular.element("<input type='text' style='width:100%;height:100%'>");
-                editor.val(JSON.stringify(scope.value));
+                if(scope.stringOnly){
+                    editor.val(scope.value)
+                } else {
+                    editor.val(JSON.stringify(scope.value));
+                }
                 element.html('');
                 element.append(editor);
                 editor.select();
                 editor.bind("blur", function () {
-                    element.html(val(scope.value));
+                    if(!scope.stringOnly){
+                        element.html(val(scope.value));
+                    } else {
+                        element.text(scope.value);
+                    }
                 });
                 editor.bind("keydown", function (e) {
                     editor.css("backgroundColor", "");
@@ -126,7 +139,14 @@ angular.module("storageExplorer").directive("entryValue", function ($compile) {
                             newValue = null;
                         }
                         try {
-                            scope.$emit("$valueChanged", scope.key, JSON.parse(newValue));
+                            var transmittedValue;
+                            if(scope.stringOnly){
+                                transmittedValue = newValue;
+                            } else {
+                               transmittedValue = JSON.parse(newValue);
+                            }
+
+                            scope.$emit("$valueChanged", scope.key, transmittedValue);
                         } catch (e) {
                             editor.css("backgroundColor", "red");
                             return;
@@ -141,7 +161,11 @@ angular.module("storageExplorer").directive("entryValue", function ($compile) {
 
             scope.$watch('value', function () {
                 element.html('');
+                if(!scope.stringOnly) {
                 element.html(val(scope.value));
+                } else {
+                    element.text(scope.value);
+                }
             });
         }
     }

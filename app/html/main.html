@@ -10,7 +10,7 @@
 
             <li ng-repeat="storageDescriptor in storageDescriptors"
                 ng-class="{active:currentType == storageDescriptor.name}"
-                ng-click="setType(storageDescriptor.name)">
+                ng-click="setType(storageDescriptor)">
                 <a>
                     {{storageDescriptor.title}}
                     <div ng-if="storageDescriptor.name == 'local'">
@@ -77,7 +77,7 @@
                 </td>
                 <td>
                     <entry-value class="displayedValue" value="result.value"
-                                 key="result.name"></entry-value>
+                                 string-only="currentDescriptor.stringOnly" key="result.name" ></entry-value>
                 </td>
                 <td style="white-space: nowrap">
 

@@ -3,11 +3,11 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $r
     var results = $scope.results = [];
     $rootScope.editObject = {};
     var descriptos = {
-        "local": "Local Storage Area",
-        "sync": "Sync Storage Area",
-        "managed": "Managed Storage Area",
-        "localStorage": "Window.localStorage",
-        "sessionStorage": "Window.sessionStorage"
+        "local": {title: "Local Storage Area"},
+        "sync": {title: "Sync Storage Area"},
+        "managed": {title: "Managed Storage Area", readonly: true},
+        "localStorage": {title: "Window.localStorage", stringOnly: true},
+        "sessionStorage": {title: "Window.sessionStorage", stringOnly: true}
     };
 
 
@@ -15,16 +15,22 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $r
         $rootScope.storageDescriptors = [];
 
         appInfo.storageTypes.forEach(function (value) {
-            if(!$rootScope.currentType){
+            if (!$rootScope.currentType) {
                 $rootScope.currentType = value;
-            }
 
-            $rootScope.storageDescriptors.push({name: value, title: descriptos[value]});
+            }
+            var descriptor = descriptos[value];
+            descriptor.name = value;
+            if (!$rootScope.currentDescriptor) {
+                $rootScope.currentDescriptor = descriptor;
+            }
+            $rootScope.storageDescriptors.push(descriptor);
         });
 
         $rootScope.mode = 'list';
         $rootScope.setType = function (type) {
-            $rootScope.currentType = type;
+            $rootScope.currentType = type.name;
+            $rootScope.currentDescriptor = type;
         };
         $scope.stats = {
             local: {},
@@ -72,6 +78,7 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $r
         function refreshStats() {
             $scope.itemCount = 0;
             $scope.bytesInUse = 0;
+            //TODO Fix stats
 //            angular.forEach($scope.stats, function (stats, type) {
 //                storage[type].getBytesInUse(function (bytes) {
 //                    $scope.stats[type].bytesInUse = bytes;
@@ -90,13 +97,29 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $r
 
         $scope.$on("$storageChanged", function (event, change) {
             if ($scope.currentType === change.type) {
+                var specialStorages = ["localStorage", "sessionStorage"]; //Omg this app already seen so many hacks...
                 angular.forEach(change.changes, function (val, key) {
-                    if (angular.isDefined(val.newValue)) {
-                        rawData[key] = val.newValue;
+                    if (specialStorages.indexOf(change.type) > -1) {
+                        if (key === "") {
+                            rawData = {};
+                        } else {
+                            if (val === null) {
+                                delete rawData[key];
+                            } else {
+                                rawData[key] = val.newValue;
+                            }
+                        }
+
                     } else {
-                        delete rawData[key];
+                        if (angular.isDefined(val.newValue)) {
+                            rawData[key] = val.newValue;
+                        } else {
+                            delete rawData[key];
+                        }
                     }
+
                 });
+
                 adaptRawData();
                 refreshStats();
             }
