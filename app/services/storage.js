@@ -1,4 +1,4 @@
-angular.module("storageExplorer").factory("storage", function ($q, $rootScope, appContext, evalService, runtime, delegateStorage, targetPageInject) {
+angular.module("storageExplorer").factory("storage", function ($q, $rootScope, appContext, evalService, runtime, delegateStorage, targetPageInject, extensionPageInject) {
     if (!chrome.devtools && chrome.storage) {
         var returnValue = {};
 
@@ -61,27 +61,39 @@ angular.module("storageExplorer").factory("storage", function ($q, $rootScope, a
     };
     appContext()
         .then(function (appInfo) {
-            var tab = false;
+            var connection = {};
+            var remoteId;
             if (appInfo.id) {
+                connection.appId = appInfo.id;
                 remoteId = appInfo.id;
-            } else {
-                tab = true;
+            }
+            if (appInfo.tabId) {
+                connection.tabId = appInfo.tabId;
+            }
+            if (!appInfo.id && appInfo.tabId) {
                 remoteId = "for_tab_" + appInfo.tabId;
             }
 
+
             port = runtime.connect({name: remoteId});
+            connection.port = port;
             port.onMessage.addListener(function (message) {
-                if (message.from === remoteId && message.obj.change) {
-                    $rootScope.$broadcast("$storageChanged", message.obj);
-                }
+
+
                 if (message == "portConnected") {
-                    if (!tab) {
+                    if (appInfo.id && appInfo.tabId) {
+                        evalService.evalFunction(extensionPageInject, {'APP_ID': runtime.id}).then(function () {
+                            connectionDeferred.resolve(connection);
+                        });
+                    } else if (appInfo.id) {
                         evalService.evalFunction(targetPageInject, {'APP_ID': runtime.id}).then(function () {
-                            connectionDeferred.resolve({port: port, remoteId: remoteId});
+                            connectionDeferred.resolve(connection);
                         });
                     } else {
-                        connectionDeferred.resolve({port: port, remoteId: remoteId})
+                        connectionDeferred.resolve(connection)
                     }
+                } else if (message.from.app == appInfo.id && message.from.tab == appInfo.tabId && message.obj.change) {
+                    $rootScope.$broadcast("$storageChanged", message.obj);
                 }
                 !$rootScope.$$phase && $rootScope.$apply();
 

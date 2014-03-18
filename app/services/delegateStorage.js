@@ -20,7 +20,7 @@ angular.module("storageExplorer").factory('delegateStorage', function ($rootScop
         $q.when(connectionPromise).then(function (connection) {
             connectionPromise = connection;
             connection.port.onMessage.addListener(function (message) {
-                if (message.from !== connection.remoteId) {
+                if (message.from.tab != connection.tabId || message.from.app != connection.appId) {
                     return;
                 }
 
@@ -76,7 +76,7 @@ angular.module("storageExplorer").factory('delegateStorage', function ($rootScop
                     methodCallbacks[message.id] = callback;
                 }
                 $q.when(connectionPromise).then(function (connection) {
-                    message.target = connection.remoteId;
+                    message.target = connection.appId;
                     connection.port.postMessage(message);
                 });
 
