@@ -11,7 +11,7 @@
             <li ng-repeat="storageDescriptor in storageDescriptors"
                 ng-class="{active:currentType == storageDescriptor.name}"
                 ng-click="setType(storageDescriptor)">
-                <a>
+                <a style="height: 40px">
                     {{storageDescriptor.title}}
                     <div ng-if="storageDescriptor.name == 'local'">
                         <div class="usage" ng-if="stats.local.bytesInUse > 0">
@@ -71,7 +71,7 @@
             <tr ng-repeat="result in results" class="list-row">
                 <td><span class="valueKey">{{result.name}}</span>
 
-                    <div class="usage"> {{result.bytesInUse | prettyBytes}}
+                    <div class="usage" ng-if="!currentDescriptor.stringOnly"> {{result.bytesInUse | prettyBytes}}
                         <span ng-if="currentType == 'sync'"> / {{meta.sync.QUOTA_BYTES_PER_ITEM | prettyBytes}}</span>
                     </div>
                 </td>
