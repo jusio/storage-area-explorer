@@ -22,10 +22,10 @@ module.exports = function (config) {
             'app/**/*.js',
             'test/unit/*/*.js'
         ],
-        preprocessors: {
-            'app/*.js': 'coverage',
-            'app/**/*.js': 'coverage'
-        },
+//        preprocessors: {
+//            'app/*.js': 'coverage',
+//            'app/**/*.js': 'coverage'
+//        },
 
 
         // list of files to exclude

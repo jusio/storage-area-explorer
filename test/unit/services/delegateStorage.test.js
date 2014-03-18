@@ -5,6 +5,7 @@ describe("Test delegate storage", function () {
     var port;
     beforeEach(module("storageExplorer"));
 
+
     beforeEach(function () {
         inject(function (delegateStorage, $q, $rootScope) {
             _delegateStorage = delegateStorage;
@@ -56,25 +57,6 @@ describe("Test delegate storage", function () {
         expect(callback).toHaveBeenCalled();
     });
 
-    it("Should ignore messages with wrong id,empty id,type, and source", function () {
-        var deferred = q.defer();
-        var storageArea = _delegateStorage(deferred.promise, 'local');
-        var messageID;
-        port.postMessage = function (message) {
-            expect(message.id).toBeDefined();
-            messageID = message.id;
-        };
-        deferred.resolve({remoteId: "remote", port: port});
-        var callback = jasmine.createSpy("callback");
-        storageArea.get({}, callback);
-        rootScope.$apply();
-        port.onMessage({from: '', obj: {id: messageID, type: 'local'}});
-        port.onMessage({from: 'remote', obj: {id: 'as', type: 'local'}});
-        port.onMessage({from: 'remote', obj: {type: 'local'}});
-        port.onMessage({from: 'remote', obj: {id: messageID, type: 'someothertype'}});
-        expect(callback).not.toHaveBeenCalled();
-    });
-
     it("Should correctly resolve getMeta, one first and second calls", function () {
         var deferred = q.defer();
         var storageArea = _delegateStorage(deferred.promise, 'local');
@@ -108,7 +90,6 @@ describe("Test delegate storage", function () {
         var calledMethods = [];
         var remoteId = "remoteId";
         port.postMessage = function (message) {
-            expect(message.target).toBe(remoteId);
             expect(methods.indexOf(message.method) > -1).toBeTruthy();
             expect(message.args[0]).toBe("testArg");
             expect(message.type).toBe('local');

@@ -1,8 +1,8 @@
-angular.module("storageExplorer").factory("appContext", function ($q, $rootScope, evalService) {
+angular.module("storageExplorer").factory("appContext", function ($q, $rootScope, evalService,devtools) {
     return function () {
         return evalService.evalFunction(function (chrome) {
             var storageTypes = [];
-            var returnValue = {storageTypes:storageTypes};
+            var returnValue = {storageTypes: storageTypes};
 
             try {
                 returnValue.id = chrome.runtime.id;
@@ -32,18 +32,16 @@ angular.module("storageExplorer").factory("appContext", function ($q, $rootScope
 //            console.log("Almost finished", returnValue);
             return returnValue;
         }).then(function (result) {
-            try{
             var info = {
                 id: result.id,
                 manifest: result.manifest,
-                tabId: chrome.devtools.inspectedWindow.tabId,
+                tabId: devtools.inspectedWindow.tabId,
                 storageTypes: result.storageTypes
             };
-            if(result.manifest){
+            if (result.manifest) {
                 info.name = result.manifest.name;
             }
-            }catch(e){
-            }
+
             return $q.when(info)
         }, $q.reject());
     }

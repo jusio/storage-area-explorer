@@ -11,6 +11,7 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $r
     };
 
 
+
     appContext().then(function (appInfo) {
         $rootScope.storageDescriptors = [];
 
@@ -78,21 +79,20 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $r
         function refreshStats() {
             $scope.itemCount = 0;
             $scope.bytesInUse = 0;
-            //TODO Fix stats
-//            angular.forEach($scope.stats, function (stats, type) {
-//                storage[type].getBytesInUse(function (bytes) {
-//                    $scope.stats[type].bytesInUse = bytes;
-//                });
-//            });
-//            storage.sync.get(function (obj) {
-//                $scope.stats.sync.count = Object.keys(obj).length;
-//            });
-//            angular.forEach($scope.results, function (val) {
-//                $scope.itemCount++;
-//                storage[$scope.currentType].getBytesInUse(val.name, function (amount) {
-//                    val.bytesInUse = amount;
-//                });
-//            });
+            angular.forEach($scope.stats, function (stats, type) {
+                storage[type].getBytesInUse(function (bytes) {
+                    $scope.stats[type].bytesInUse = bytes;
+                });
+            });
+            storage.sync.get(function (obj) {
+                $scope.stats.sync.count = Object.keys(obj).length;
+            });
+            angular.forEach($scope.results, function (val) {
+                $scope.itemCount++;
+                storage[$scope.currentType].getBytesInUse(val.name, function (amount) {
+                    val.bytesInUse = amount;
+                });
+            });
         }
 
         $scope.$on("$storageChanged", function (event, change) {

@@ -1,56 +1,5 @@
 angular.module("storageExplorer").factory("storage", function ($q, $rootScope, appContext, evalService, runtime, delegateStorage, targetPageInject, extensionPageInject) {
-    if (!chrome.devtools && chrome.storage) {
-        var returnValue = {};
-
-        function delegate(object, name) {
-            return function () {
-                var args = [];
-                for (var i = 0; i < arguments.length; i++) {
-                    if (angular.isFunction(arguments[i])) {
-                        (function (callback) {
-                            args.push(function (value) {
-                                callback(value);
-                                !$rootScope.$$phase && $rootScope.$apply();
-                            });
-                        })(arguments[i]);
-                        continue;
-                    }
-                    args.push(arguments[i]);
-                }
-                object[name].apply(object, args);
-            }
-        }
-
-
-        ['local', 'sync', 'localStorage', 'sessionStorage'].forEach(function (key) {
-            var meta = {};
-            var storageArea = chrome.storage[key];
-            var delegatedStorage = {};
-            returnValue[key] = delegatedStorage;
-            Object.keys(storageArea).forEach(function (stKey) {
-                if (angular.isFunction(storageArea[stKey])) {
-                    if (stKey.indexOf("on") === 0) {
-                        return;
-                    }
-                    delegatedStorage[stKey] = delegate(storageArea, stKey);
-                    return;
-                }
-                meta[stKey] = storageArea[stKey];
-            });
-            delegatedStorage.getMeta = function () {
-                return meta;
-            };
-
-        });
-        chrome.storage.onChanged.addListener(function (changes, type) {
-            $rootScope.$broadcast("$storageChanged", {changes: changes, type: type});
-        });
-
-        return returnValue;
-    }
-
     var port;
-    var remoteId;
     var connectionDeferred = $q.defer();
     returnValue = {
         sync: delegateStorage(connectionDeferred.promise, "sync"),

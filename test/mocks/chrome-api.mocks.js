@@ -16,7 +16,8 @@ function getChromeApiMock(mocks) {
     };
     chrome.devtools = {
         inspectedWindow: {
-            "eval": jasmine.createSpy("devtools.inspectedWindow.eval")
+            "eval": jasmine.createSpy("devtools.inspectedWindow.eval"),
+            tabId:11
         }
     };
     chrome.extension = {

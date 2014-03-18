@@ -66,11 +66,11 @@ describe("Test storage", function () {
         expect(appContextMock).toHaveBeenCalled();
         expect(delegateStorageMock).toHaveBeenCalled();
         expect(delegateStorageMock.promise).toBeDefined();
-        expect(delegateStorageMock.types.length).toBe(2);
+        expect(delegateStorageMock.types.length).toBe(5);
         expect(delegateStorageMock.types.indexOf('local')).toBeGreaterThan(-1);
         expect(delegateStorageMock.types.indexOf('sync')).toBeGreaterThan(-1);
         var callback = jasmine.createSpy("callback").andCallFake(function (connection) {
-            expect(connection.remoteId).toBe('appId');
+            expect(connection.appId).toBe('appId');
             expect(connection.port).toBe(usedPort);
         });
         delegateStorageMock.promise.then(callback);
@@ -90,7 +90,7 @@ describe("Test storage", function () {
         });
         rootScope.$on("$storageChanged", callback);
         var obj = {change: true};
-        usedPort.onMessage({from: 'appId', obj: obj});
+        usedPort.onMessage({from:{app: 'appId'}, obj: obj});
         expect(callback).toHaveBeenCalled();
     });
 

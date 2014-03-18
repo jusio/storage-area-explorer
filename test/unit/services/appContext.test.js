@@ -15,6 +15,7 @@ describe("Testing appContext Service", function () {
         module(function ($provide) {
 
             $provide.value("evalService", evalService);
+            $provide.value("devtools",chromeApi.devtools);
 
         });
         inject(function ($injector, $q) {
@@ -24,11 +25,13 @@ describe("Testing appContext Service", function () {
     });
 
 
+
     it("On success should call evalService.evalFunction and resolve promise with results", function () {
         var callbackCalled = false;
         var appContext = injector.get('appContext');
         appContext().then(function (appInfo) {
-            expect(appInfo.name).toBe("test");
+            console.log(appInfo);
+            expect(appInfo.tabId).toBe(11);
             expect(appInfo.id).toBe("id");
             callbackCalled = true;
         });
