@@ -103,7 +103,7 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $r
                         if (key === "") {
                             rawData = {};
                         } else {
-                            if (val === null) {
+                            if (va.newValue === null) {
                                 delete rawData[key];
                             } else {
                                 rawData[key] = val.newValue;
