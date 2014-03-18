@@ -1,5 +1,6 @@
-function initializeExtension(runtime, extension, $document) {
+function initializeExtension(runtime, extension, $document, tabs) {
     var ports = {};
+
     var externalPorts = {};
 
 
@@ -16,81 +17,109 @@ function initializeExtension(runtime, extension, $document) {
         });
     }
 
+
+    function clearTabsPorts(tabPortName, portInstance){
+        var otherName;
+        if(tabPortName.indexOf("for_tab_") > -1){
+           otherName = "inspected_window_" + tabPortName.substring("for_tab_".length);
+        } else if (tabPortName == "inspected_window_") {
+            tabPortName = tabPortName + portInstance.sender.tab.id;
+        }
+        [tabPortName,otherName].forEach(function(name){
+            var portToDisconnect = ports[name];
+            if(!portToDisconnect){
+                return;
+            }
+            if(portToDisconnect != portInstance){
+                portToDisconnect.disconnect();
+            }
+            delete ports[name];
+        });
+
+
+    }
+
     extension.onConnect.addListener(function (port) {
-        if (port.name && !ports[port.name]) {
-            ports[port.name] = port;
-            if (port.name === runtime.id) {
-                chrome.storage.onChanged.addListener(function (changes, name) {
-                    port.postMessage({from: runtime.id, obj: {change: true, changes: changes, type: name}});
+        console.debug("connectedPort from tab ", port.sender);
+        if (!ports[port.name]) {
+            if (port.name.indexOf("for_tab_") === 0) {
+                console.log("Devtools listenening for tab ",port.name);
+                ports[port.name] = port;
+                var tabId = parseInt(port.name.substring("for_tab_".length));
+                tabs.executeScript(tabId, {file: "app/chrome/htmlStorageHook.js"},function(e,p){
+                    port.postMessage("portConnected");
+                });
+                port.onMessage.addListener(function (message) {
+                    var target = ports["inspected_tab_" + tabId];
+                    target.postMessage(message);
+                });
+                port.onDisconnect.addListener(function(){
+                    clearTabsPorts(port.name,port);
+                });
+
+            } else if (port.name == "inspected_tab_") {
+                console.log("Inspected tab connected",port.name);
+                ports["inspected_tab_" + port.sender.tab.id] = port;
+                port.onMessage.addListener(function(message){
+
+                    var devtoolsPort = ports["for_tab_" + port.sender.tab.id];
+                    devtoolsPort.postMessage({from:"for_tab_" + port.sender.tab.id, obj:message});
+                });
+                port.onDisconnect.addListener(function(){
+                   clearTabsPorts(port.name,port);
+                });
+
+            } else {
+                console.log("Another port connected",port);
+                ports[port.name] = port;
+                port.onMessage.addListener(function (message) {
+                    if (externalPorts[port.name]) {
+                        externalPorts[port.name].postMessage(message);
+                    } else {
+                        port.disconnect();
+                        throw new Error("Couldn't find external port for " + port.name);
+                    }
+
+                });
+                port.postMessage("portConnected");
+                port.onDisconnect.addListener(function () {
+                    console.debug("Local Port for " + port.name + " Disconnected, disconnecting external port");
+                    portDisconnected(port.name, port);
                 });
             }
-            port.postMessage("portConnected");
-            console.debug("Local port " + port.name + " connected");
+
         } else {
             port.disconnect();
             throw new Error("Trying to register port for extension which is already existing. Extension id " + port.name);
         }
 
-        port.onMessage.addListener(function (message) {
-            if (port.name !== runtime.id) {
-                if (externalPorts[port.name]) {
-                    externalPorts[port.name].postMessage(message);
-                } else {
-                    port.disconnect();
-                    throw new Error("Couldn't find external port for " + port.name);
-                }
-            } else {
-                var storage = chrome.storage[message.type];
-                var method = storage[message.method];
-                var args = [];
-                if (message.args) {
-                    message.args.forEach(function (arg) {
-                        args.push(arg);
-                    });
-                }
-                args.push(function () {
-                    var results = [];
-                    for (var i = 0; i < arguments.length; i++) {
-                        results.push(arguments[i]);
-                    }
-                    message.results = results;
-                    port.postMessage({from: runtime.id, obj: message});
-                });
-                message.meta = {};
-                for (var j in storage) {
-                    if (typeof storage[j] === 'function') {
-                        continue;
-                    }
-                    message.meta[j] = storage[j];
-                }
-                method.apply(storage, args);
-            }
-        });
-        port.onDisconnect.addListener(function () {
-            console.debug("Local Port for " + port.name + "Disconnected, disconnecting external port");
-            portDisconnected(port.name, port);
-        });
 
     });
 
+
+    //only invoked by chrome apps
     extension.onConnectExternal.addListener(function (externalPort) {
         var senderId = externalPort.sender.id;
+        console.debug("url " + externalPort.sender.url);
+        console.debug("tab " + externalPort.tab);
         console.debug("External port connected from app " + senderId);
-        if (ports[senderId]) {
+        var portName = senderId;
+
+        if (ports[portName]) {
             externalPort.onDisconnect.addListener(function () {
                 console.debug("External port from app " + senderId + " disconnected, disconnecting local port");
-                portDisconnected(senderId, externalPort);
+                portDisconnected(portName, externalPort);
             });
             externalPort.onMessage.addListener(function (message) {
-                var port = ports[senderId];
+                var port = ports[portName];
                 if (port) {
-                    port.postMessage({from: senderId, obj: message});
+                    port.postMessage({from: portName, obj: message});
                 } else {
                     externalPort.disconnect();
                     throw new Error("There is no port for handling messages from " + sender.id);
                 }
             });
-            externalPorts[senderId] = externalPort;
+            externalPorts[portName] = externalPort;
 
         } else {
             externalPort.disconnect();
@@ -120,6 +149,6 @@ function initializeExtension(runtime, extension, $document) {
 
 }
 if (chrome.runtime && chrome.extension && document) {
-    initializeExtension(chrome.runtime, chrome.extension, document);
+    initializeExtension(chrome.runtime, chrome.extension, document, chrome.tabs);
 }
 

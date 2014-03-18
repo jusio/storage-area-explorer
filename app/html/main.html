@@ -1,38 +1,51 @@
-<div ng-show="mode =='error'" class="explorer-disabled">
-    <h3>Explorer is disabled on normal web pages or extensions without storage permission </h3>
+<div ng-if="mode =='error'" class="explorer-disabled">
+    <h3>Explorer is disabled on normal web pages or extensions without storage
+        permission </h3>
+
     <h3><a href="#" ng-click="reload()">Refresh</a></h3>
 </div>
 <div ng-controller="StorageCtrl" class="main" ng-hide="mode=='error'">
     <div class="header">
         <ul class="nav nav-tabs">
-            <li ng-class="{active:currentType == 'local'}" ng-click="setType('local')"><a>Local Storage Area
 
-                <div class="usage" ng-show="stats.local.bytesInUse > 0">{{stats.local.bytesInUse |
-                    prettyBytes}} / {{meta.local.QUOTA_BYTES | prettyBytes}}
-                </div>
-                <div class="usage" ng-show="stats.local.bytesInUse == 0">
-                    area is empty
-                </div>
-            </a></li>
-            <li ng-class="{active:currentType == 'sync'}" ng-click="setType('sync')"><a>Synchronous Storage
-                Area
-                <div class="usage" ng-show="stats.sync.bytesInUse > 0">{{stats.sync.bytesInUse |
-                    prettyBytes}} / {{meta.sync.QUOTA_BYTES | prettyBytes}}, {{stats.sync.count}} /
-                    {{meta.sync.MAX_ITEMS}} items
-                </div>
-                <div class="usage" ng-show="stats.sync.bytesInUse == 0">
-                    area is empty
-                </div>
-            </a></li>
-            <a class="pull-right" href="/app/html/options.html" title="Options, Links and Other Stuff"
-               target="_blank"><span class="glyphicon glyphicon-comment"></span></a>
+            <li ng-repeat="storageDescriptor in storageDescriptors"
+                ng-class="{active:currentType == storageDescriptor.name}"
+                ng-click="setType(storageDescriptor.name)">
+                <a>
+                    {{storageDescriptor.title}}
+                    <div ng-if="storageDescriptor.name == 'local'">
+                        <div class="usage" ng-if="stats.local.bytesInUse > 0">
+                            {{stats.local.bytesInUse |
+                            prettyBytes}} / {{meta.local.QUOTA_BYTES | prettyBytes}}
+                        </div>
+                        <div class="usage" ng-if="stats.local.bytesInUse == 0">
+                            area is empty
+                        </div>
+                    </div>
+
+                    <div ng-if="storageDescriptor.name == 'sync'">
+                        <div class="usage" ng-if="stats.sync.bytesInUse > 0">
+                            {{stats.sync.bytesInUse |
+                            prettyBytes}} / {{meta.sync.QUOTA_BYTES | prettyBytes}},
+                            {{stats.sync.count}} /
+                            {{meta.sync.MAX_ITEMS}} items
+                        </div>
+                        <div class="usage" ng-if="stats.sync.bytesInUse == 0">
+                            area is empty
+                        </div>
+                    </div>
+                </a>
+            </li>
+
         </ul>
 
     </div>
-    <div class="alert alert-danger" ng-show="importError">
-        <button type="button" class="close" ng-click="importError = null">&times;</button>
-        <strong>Import <span ng-show="importError.file"> from file {{importError.file}}</span><span
-                ng-show="!importError.file">from clipboard </span> failed</strong><br>
+    <div class="alert alert-danger" ng-if="importError">
+        <button type="button" class="close"
+                ng-click="importError = null">&times;</button>
+        <strong>Import <span
+                ng-if="importError.file"> from file {{importError.file}}</span><span
+                ng-if="!importError.file">from clipboard </span> failed</strong><br>
         {{importError.message}}<br>
         <strong>{{importError.type}} contents</strong>
         <pre>
@@ -40,34 +53,11 @@
         </pre>
 
     </div>
-    <div ng-show="mode == 'list'" class="list">
-        <div class="controls" ng-controller="ExportImportCtrl">
-            <button class="btn btn-primary btn-xs" ng-click="add()">Add Item</button>
-            <button class="btn btn-warning btn-xs" ng-click="clear()" ng-show="itemCount > 0">Clear</button>
-            <div class="btn-group" ng-show="itemCount > 0">
-                <button class="btn btn-info dropdown-toggle btn-xs" data-toggle="dropdown">Export <span
-                        class="caret"></span></button>
-                <ul class="dropdown-menu" role="menu">
-                    <li><a href="#" ng-click="export()"><span class="glyphicon glyphicon-download"></span> To File</a>
-                    </li>
-                    <li><a href="#" ng-click="exportClipboard()"><span class="glyphicon glyphicon-export"></span> To
-                        Clipboard</a></li>
-                </ul>
-
-            </div>
-            <div class="btn-group">
-                <button type="button" class="btn btn-info dropdown-toggle btn-xs" data-toggle="dropdown">
-                    Import <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu" role="menu">
-                    <li><a href="#" ng-click="import()">From File</a></li>
-                    <li><a href="#" ng-click="importClipboard()">From Clipboard</a></li>
-                </ul>
-            </div>
-        </div>
+    <div ng-if="mode == 'list'" class="list">
+        <ng-include src="'fragments/exportImport.html'"></ng-include>
 
 
-        <table ng-show="itemCount > 0" class="table table-striped table-hover">
+        <table ng-if="results.length > 0" class="table table-striped table-hover">
             <thead>
             <tr class="list-row">
                 <th>
@@ -82,37 +72,44 @@
                 <td><span class="valueKey">{{result.name}}</span>
 
                     <div class="usage"> {{result.bytesInUse | prettyBytes}}
-                        <span ng-show="currentType == 'sync'"> / {{meta.sync.QUOTA_BYTES_PER_ITEM | prettyBytes}}</span>
+                        <span ng-if="currentType == 'sync'"> / {{meta.sync.QUOTA_BYTES_PER_ITEM | prettyBytes}}</span>
                     </div>
                 </td>
                 <td>
-                    <entry-value class="displayedValue" value="result.value" key="result.name"/>
+                    <entry-value class="displayedValue" value="result.value"
+                                 key="result.name"></entry-value>
                 </td>
                 <td style="white-space: nowrap">
 
-                    <button class="btn btn-default btn-xs" ng-click="edit(result.name)"><span
+                    <button class="btn btn-default btn-xs"
+                            ng-click="edit(result.name)"><span
                             class="glyphicon glyphicon-edit"></span></button>
-                    <button class="btn btn-danger btn-xs" ng-click="delete(result.name)"><span
-                            class="glyphicon glyphicon-remove-circle"></span></button>
+                    <button class="btn btn-danger btn-xs"
+                            ng-click="delete(result.name)"><span
+                            class="glyphicon glyphicon-remove-circle"></span>
+                    </button>
                 </td>
             </tr>
             </tbody>
         </table>
-        <div ng-show="itemCount == 0">
+        <div ng-if="results.length == 0">
             <h3>Storage Area is empty</h3>
         </div>
 
     </div>
 
-    <div ng-show="mode == 'edit' || mode == 'add'" class="editPanel" ng-controller="AddEditItemCtrl">
+    <div ng-if="mode == 'edit' || mode == 'add'" class="editPanel"
+         ng-controller="AddEditItemCtrl">
 
-        <input id="key" class="key form-control" type="text" ng-model="editObject.key" placeholder="Name Of Key">
+        <input id="key" class="key form-control" type="text"
+               ng-model="editObject.key" placeholder="Name Of Key">
 
-        <span class="text-info" ng-show="!validation">Value in JSON format e.g. all the strings should be enclosed in double quotes: "example"</span>
+        <span class="text-info" ng-if="!validation">Value in JSON format e.g. all the strings should be enclosed in double quotes: "example"</span>
         <span class="text-warning"
-              ng-show="validation">Value is not valid JSON: {{validation}}</span>
+              ng-if="validation">Value is not valid JSON: {{validation}}</span>
 
-        <textarea id="value" class="value form-control" ng-model="editObject.value" placeholder='Value '>
+        <textarea id="value" class="value form-control" ng-model="editObject.value"
+                  placeholder='Value '>
 
         </textarea>
 

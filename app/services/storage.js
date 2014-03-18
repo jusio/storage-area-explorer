@@ -22,7 +22,7 @@ angular.module("storageExplorer").factory("storage", function ($q, $rootScope, a
         }
 
 
-        ['local', 'sync'].forEach(function (key) {
+        ['local', 'sync', 'localStorage', 'sessionStorage'].forEach(function (key) {
             var meta = {};
             var storageArea = chrome.storage[key];
             var delegatedStorage = {};
@@ -54,26 +54,40 @@ angular.module("storageExplorer").factory("storage", function ($q, $rootScope, a
     var connectionDeferred = $q.defer();
     returnValue = {
         sync: delegateStorage(connectionDeferred.promise, "sync"),
-        local: delegateStorage(connectionDeferred.promise, "local")
+        local: delegateStorage(connectionDeferred.promise, "local"),
+        managed: delegateStorage(connectionDeferred.promise, "managed"),
+        localStorage: delegateStorage(connectionDeferred.promise, "localStorage"),
+        sessionStorage: delegateStorage(connectionDeferred.promise, "sessionStorage")
     };
     appContext()
         .then(function (appInfo) {
-            remoteId = appInfo.id;
+            var tab = false;
+            if (appInfo.id) {
+                remoteId = appInfo.id;
+            } else {
+                tab = true;
+                remoteId = "for_tab_" + appInfo.tabId;
+            }
+
             port = runtime.connect({name: remoteId});
             port.onMessage.addListener(function (message) {
                 if (message.from === remoteId && message.obj.change) {
                     $rootScope.$broadcast("$storageChanged", message.obj);
                 }
                 if (message == "portConnected") {
-                    evalService.evalFunction(targetPageInject, {'APP_ID': runtime.id}).then(function () {
-                        connectionDeferred.resolve({port: port, remoteId: remoteId});
-                    });
+                    if (!tab) {
+                        evalService.evalFunction(targetPageInject, {'APP_ID': runtime.id}).then(function () {
+                            connectionDeferred.resolve({port: port, remoteId: remoteId});
+                        });
+                    } else {
+                        connectionDeferred.resolve({port: port, remoteId: remoteId})
+                    }
                 }
                 !$rootScope.$$phase && $rootScope.$apply();
 
             });
             port.onDisconnect.addListener(function () {
-                window.location.reload();
+//                window.location.reload();
             });
 
         });

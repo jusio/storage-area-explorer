@@ -1,0 +1,25 @@
+<div class="controls" ng-controller="ExportImportCtrl">
+    <button class="btn btn-primary btn-xs" ng-click="add()">Add Item</button>
+    <button class="btn btn-warning btn-xs" ng-click="clear()" ng-show="itemCount > 0">Clear</button>
+    <div class="btn-group" ng-show="itemCount > 0">
+        <button class="btn btn-info dropdown-toggle btn-xs" data-toggle="dropdown">Export
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            <li><a href="#" ng-click="export()"><span class="glyphicon glyphicon-download"></span> To File</a>
+            </li>
+            <li><a href="#" ng-click="exportClipboard()"><span class="glyphicon glyphicon-export"></span> To
+                Clipboard</a></li>
+        </ul>
+
+    </div>
+    <div class="btn-group">
+        <button type="button" class="btn btn-info dropdown-toggle btn-xs" data-toggle="dropdown">
+            Import <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            <li><a href="#" ng-click="import()">From File</a></li>
+            <li><a href="#" ng-click="importClipboard()">From Clipboard</a></li>
+        </ul>
+    </div>
+</div>

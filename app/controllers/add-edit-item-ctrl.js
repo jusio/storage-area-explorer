@@ -1,4 +1,6 @@
 angular.module("storageExplorer").controller("AddEditItemCtrl", function ($scope, $rootScope, storage) {
+
+
     $rootScope.$watch('editObject', function () {
         if ($rootScope.editObject.value) {
             try {

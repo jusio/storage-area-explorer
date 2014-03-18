@@ -1,10 +1,28 @@
 angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $rootScope, storage, prettyJson, $window, $timeout, appContext) {
     var rawData;
-    $scope.results = [];
+    var results = $scope.results = [];
     $rootScope.editObject = {};
-    appContext().then(function () {
+    var descriptos = {
+        "local": "Local Storage Area",
+        "sync": "Sync Storage Area",
+        "managed": "Managed Storage Area",
+        "localStorage": "Window.localStorage",
+        "sessionStorage": "Window.sessionStorage"
+    };
+
+
+    appContext().then(function (appInfo) {
+        $rootScope.storageDescriptors = [];
+
+        appInfo.storageTypes.forEach(function (value) {
+            if(!$rootScope.currentType){
+                $rootScope.currentType = value;
+            }
+
+            $rootScope.storageDescriptors.push({name: value, title: descriptos[value]});
+        });
+
         $rootScope.mode = 'list';
-        $rootScope.currentType = 'local';
         $rootScope.setType = function (type) {
             $rootScope.currentType = type;
         };
@@ -54,20 +72,20 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $r
         function refreshStats() {
             $scope.itemCount = 0;
             $scope.bytesInUse = 0;
-            angular.forEach($scope.stats, function (stats, type) {
-                storage[type].getBytesInUse(function (bytes) {
-                    $scope.stats[type].bytesInUse = bytes;
-                });
-            });
-            storage.sync.get(function (obj) {
-                $scope.stats.sync.count = Object.keys(obj).length;
-            });
-            angular.forEach($scope.results, function (val) {
-                $scope.itemCount++;
-                storage[$scope.currentType].getBytesInUse(val.name, function (amount) {
-                    val.bytesInUse = amount;
-                });
-            });
+//            angular.forEach($scope.stats, function (stats, type) {
+//                storage[type].getBytesInUse(function (bytes) {
+//                    $scope.stats[type].bytesInUse = bytes;
+//                });
+//            });
+//            storage.sync.get(function (obj) {
+//                $scope.stats.sync.count = Object.keys(obj).length;
+//            });
+//            angular.forEach($scope.results, function (val) {
+//                $scope.itemCount++;
+//                storage[$scope.currentType].getBytesInUse(val.name, function (amount) {
+//                    val.bytesInUse = amount;
+//                });
+//            });
         }
 
         $scope.$on("$storageChanged", function (event, change) {
