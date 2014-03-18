@@ -14,11 +14,22 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $r
 
     appContext().then(function (appInfo) {
         $rootScope.storageDescriptors = [];
-
+        $scope.stats = {
+            local: {},
+            sync: {}
+        };
+        $scope.meta = {
+            sync: null,
+            local: null
+        };
         appInfo.storageTypes.forEach(function (value) {
             if (!$rootScope.currentType) {
                 $rootScope.currentType = value;
-
+            }
+            if(value === "sync" || value === 'local'){
+                storage[value].getMeta().then(function(meta){
+                    $scope.meta[value] = meta;
+                })
             }
             var descriptor = descriptos[value];
             descriptor.name = value;
@@ -33,14 +44,7 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $r
             $rootScope.currentType = type.name;
             $rootScope.currentDescriptor = type;
         };
-        $scope.stats = {
-            local: {},
-            sync: {}
-        };
-        $scope.meta = {
-            sync: storage.sync.getMeta(),
-            local: storage.local.getMeta()
-        };
+
         $scope.delete = function (key) {
             storage[$scope.currentType].remove(key);
         };
@@ -79,6 +83,11 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $r
         function refreshStats() {
             $scope.itemCount = 0;
             $scope.bytesInUse = 0;
+
+            if($rootScope.currentDescriptor.stringOnly){
+                return;
+            }
+
             angular.forEach($scope.stats, function (stats, type) {
                 storage[type].getBytesInUse(function (bytes) {
                     $scope.stats[type].bytesInUse = bytes;
