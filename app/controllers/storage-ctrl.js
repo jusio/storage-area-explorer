@@ -57,10 +57,14 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $r
             $rootScope.mode = 'edit';
             $rootScope.editObject.key = name;
             var value = rawData[name];
-            if (!angular.isObject(value)) {
-                $rootScope.editObject.value = JSON.stringify(value);
+            if(!$rootScope.currentDescriptor.stringOnly) {
+                if (!angular.isObject(value)) {
+                    $rootScope.editObject.value = JSON.stringify(value);
+                } else {
+                    $rootScope.editObject.value = prettyJson(value);
+                }
             } else {
-                $rootScope.editObject.value = prettyJson(value);
+                $rootScope.editObject.value = value;
             }
         };
         $scope.clear = function () {
