@@ -22,6 +22,7 @@ describe("Testing AddEditItem controller", function () {
         scope = $rootScope.$new();
         rootScope = $rootScope;
         editObject = rootScope.editObject = {};
+        rootScope.currentDescriptor = {stringOnly:false};
         rootScope.currentType = "local";
         ctrl = $controller('AddEditItemCtrl', {$scope: scope,
                 storage: storageMock

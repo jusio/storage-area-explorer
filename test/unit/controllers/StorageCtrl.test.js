@@ -26,7 +26,14 @@ describe("Testing storage controller", function () {
             callback(100);
         });
 
+        localStorageMock.getMeta = jasmine.createSpy("getMeta").andCallFake(function(){
+            return {then:function(){}};
+        });
+
         syncStorageMock = jasmine.createSpyObj('storage.sync', methods);
+        syncStorageMock.getMeta= jasmine.createSpy("getMeta").andCallFake(function(){
+            return {then:function(){}};
+        });
         syncStorageMock.getBytesInUse = getBytesInUse;
         localStorageMock.getBytesInUse = getBytesInUse;
         syncStorageMock.get.andCallFake(function (callback) {
@@ -38,7 +45,7 @@ describe("Testing storage controller", function () {
         };
         prettyJsonMock = jasmine.createSpy("prettyJson");
         appContextMock = jasmine.createSpy("appContext").andCallFake(function () {
-            return q.when({appId: "id", name: "name",storageTypes:["local"]});
+            return q.when({appId: "id", name: "name",storageTypes:["local","sync"]});
         });
         clipboardMock = {};
         clipboardMock.put = jasmine.createSpy("put");
@@ -66,7 +73,7 @@ describe("Testing storage controller", function () {
 
 
 
-    it("Should intialize properly", function () {
+    it("Should initialize properly", function () {
         scope.$apply();
         rootScope.setType({name:'local'});
         expect(localStorageMock.getMeta).toHaveBeenCalled();
