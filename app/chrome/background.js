@@ -127,6 +127,15 @@ PortManager.prototype.trackUiPort = function (app, tab, port) {
 };
 
 PortManager.prototype.trackTargetPort = function (app, tab, port) {
+    if(this.getTargetPort(app, tab)){
+        port.disconnect();
+        throw new Error("port for " + app + ":" + tab + " already exist");
+
+    }
+    if(!this.getUiPort(app, tab)){
+        port.disconnect();
+        throw new Error("Target port cannot be tracked before ui port exist. Id " + app + ":" + tab);
+    }
     var self = this;
     console.log("Trying to track target port for app " + app + " and tab " + tab);
     putPort(this.targetPorts, app, tab, port);
