@@ -33,12 +33,8 @@ angular.module("storageExplorer").factory("storage", function ($q, $rootScope, a
 
 
                 if (message == "portConnected") {
-                    if (appInfo.id && appInfo.tabId) {
+                    if (appInfo.id) {
                         evalService.evalFunction(extensionPageInject, {'APP_ID': runtime.id}).then(function () {
-                            connectionDeferred.resolve(connection);
-                        });
-                    } else if (appInfo.id) {
-                        evalService.evalFunction(targetPageInject, {'APP_ID': runtime.id}).then(function () {
                             connectionDeferred.resolve(connection);
                         });
                     } else {
