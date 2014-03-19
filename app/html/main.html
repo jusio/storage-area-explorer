@@ -10,7 +10,7 @@
 
             <li ng-repeat="storageDescriptor in storageDescriptors"
                 ng-class="{active:currentType == storageDescriptor.name}"
-                ng-click="setType(storageDescriptor)">
+                ng-click="setType(storageDescriptor)" ng-if="!storageDescriptor.readonly || stats[storageDescriptor.name].count > 0">
                 <a style="height: 40px">
                     {{storageDescriptor.title}}
                     <div ng-if="storageDescriptor.name == 'local'">
@@ -31,6 +31,15 @@
                             {{meta.sync.MAX_ITEMS}} items
                         </div>
                         <div class="usage" ng-if="stats.sync.bytesInUse == 0">
+                            area is empty
+                        </div>
+                    </div>
+
+                    <div ng-if="storageDescriptor.stringOnly || storageDescriptor.readonly">
+                        <div class="usage" ng-if="stats[storageDescriptor.name].count > 0">
+                            {{stats[storageDescriptor.name].count}} items
+                        </div>
+                        <div class="usage" ng-if="stats[storageDescriptor.name].count == 0">
                             area is empty
                         </div>
                     </div>
@@ -92,8 +101,11 @@
             </tr>
             </tbody>
         </table>
-        <div ng-if="results.length == 0">
-            <h3>Storage Area is empty</h3>
+        <div ng-if="results.length == 0" style="padding-top: 20px">
+            <h3>No Items in this area</h3>
+            <h4 ng-if="currentDescriptor.readonly">
+                Managed area is always readonly.
+            </h4>
         </div>
 
     </div>

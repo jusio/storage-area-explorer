@@ -90,6 +90,14 @@
         this.storage.clear();
         callback && callback();
     };
+    StorageArea.prototype.getBytesInUse = function(items,callback){
+        var bytesInUse = 0;
+        if(callback === undefined && typeof items === 'function'){
+            callback = items;
+            items = undefined;
+        }
+        callback && callback(bytesInUse);
+    };
 
 
     var frame = document.createElement("iframe");
