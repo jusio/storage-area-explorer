@@ -9,10 +9,10 @@ Chrome Developer Tools extension which allows to:
    * import storage contents from clipboard or file
 
 
-Install from latest stable 0.3.2 version from [Chrome Store](https://chrome.google.com/webstore/detail/storage-area-explorer/ocfjjjjhkpapocigimmppepjgfdecjkb)
+Install from latest stable 0.4.0 version from [Chrome Store](https://chrome.google.com/webstore/detail/storage-area-explorer/ocfjjjjhkpapocigimmppepjgfdecjkb)
 
 
-[Development version v0.4.0](https://drone.io/github.com/jusio/storage-area-explorer/files) [![Build Status](https://drone.io/github.com/jusio/storage-area-explorer/status.png)](https://drone.io/github.com/jusio/storage-area-explorer/latest)
+[Development version v0.4.1](https://drone.io/github.com/jusio/storage-area-explorer/files) [![Build Status](https://drone.io/github.com/jusio/storage-area-explorer/status.png)](https://drone.io/github.com/jusio/storage-area-explorer/latest)
 
 Screen shots:
 
