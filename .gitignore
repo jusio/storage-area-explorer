@@ -3,4 +3,5 @@
 node_modules
 build
 components
+reacttest/.module_cache
 coverage
