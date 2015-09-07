@@ -20,5 +20,4 @@ Screen shots:
 ![Editing](https://raw.github.com/jusio/storage-area-explorer/master/screenshots/editing.png)
 ![Export](https://raw.github.com/jusio/storage-area-explorer/master/screenshots/export.png)
 ![Import](https://raw.github.com/jusio/storage-area-explorer/master/screenshots/import.png)
-![HTML5 Local&Session storage inspection](https://raw.github.com/jusio/storage-area-explorer/master/screenshots/localStorage.png))
-
+![HTML5 Local&Session storage inspection](https://raw.github.com/jusio/storage-area-explorer/master/screenshots/localStorage.png)
