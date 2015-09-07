@@ -167,7 +167,7 @@ function initializeExtension(runtime, extension, $document, tabs) {
     var portManager = new PortManager();
     extension.onConnect.addListener(function (port) {
         if (port.name.indexOf("for_tab_") === 0) {
-            console.log("Devtools listenening for tab ", port.name);
+            console.log("Devtools listening for tab ", port.name);
             var tabId = parseInt(port.name.substring("for_tab_".length));
             tabs.executeScript(tabId, {file: "app/chrome/htmlStorageHook.js"}, function (e, p) {
                 port.postMessage("portConnected");
@@ -224,7 +224,10 @@ function initializeExtension(runtime, extension, $document, tabs) {
     $document.body.appendChild(area);
 
 }
+
 if (chrome.runtime && chrome.extension && document) {
     initializeExtension(chrome.runtime, chrome.extension, document, chrome.tabs);
 }
+
+
 

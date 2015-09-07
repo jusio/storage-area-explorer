@@ -5,14 +5,17 @@ angular.module("storageExplorer").factory("appContext", function ($q, $rootScope
             var returnValue = {storageTypes: storageTypes};
 
             try {
-                returnValue.id = chrome.runtime.id;
+                const location = document.location;
+                if(location == null || (location.protocol!= "https:" && location.protocol!="http:")) {
+                    returnValue.id = chrome.runtime.id;
 
-                var manifest = chrome.runtime.getManifest();
-                returnValue.manifest = manifest;
-                if (manifest.permissions.indexOf("storage") > -1 || manifest["optional_permissions"].indexOf("storage") > -1) {
-                    storageTypes.push('local');
-                    storageTypes.push('sync');
-                    storageTypes.push('managed');
+                    var manifest = chrome.runtime.getManifest();
+                    returnValue.manifest = manifest;
+                    if (manifest.permissions.indexOf("storage") > -1 || manifest["optional_permissions"].indexOf("storage") > -1) {
+                        storageTypes.push('local');
+                        storageTypes.push('sync');
+                        storageTypes.push('managed');
+                    }
                 }
 
             } catch (e) {
