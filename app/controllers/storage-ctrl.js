@@ -116,28 +116,31 @@ angular.module("storageExplorer").controller("StorageCtrl", function ($scope, $r
         $scope.$on("$storageChanged", function (event, change) {
             if ($scope.currentType === change.type) {
                 var specialStorages = ["localStorage", "sessionStorage"]; //Omg this app already seen so many hacks...
-                angular.forEach(change.changes, function (val, key) {
-                    if (specialStorages.indexOf(change.type) > -1) {
-                        if (key === "") {
-                            rawData = {};
-                        } else {
-                            if (val.newValue === null) {
-                                delete rawData[key];
+                if(change.changes=="clear" && specialStorages.indexOf(change.type) > -1){
+                    rawData = {};
+                } else {
+                    angular.forEach(change.changes, function (val, key) {
+                        if (specialStorages.indexOf(change.type) > -1) {
+                            if (key === "") {
+                                rawData = {};
                             } else {
+                                if (val.newValue === null) {
+                                    delete rawData[key];
+                                } else {
+                                    rawData[key] = val.newValue;
+                                }
+                            }
+
+                        } else {
+                            if (angular.isDefined(val.newValue)) {
                                 rawData[key] = val.newValue;
+                            } else {
+                                delete rawData[key];
                             }
                         }
 
-                    } else {
-                        if (angular.isDefined(val.newValue)) {
-                            rawData[key] = val.newValue;
-                        } else {
-                            delete rawData[key];
-                        }
-                    }
-
-                });
-
+                    });
+                }
                 adaptRawData();
                 refreshStats();
             }

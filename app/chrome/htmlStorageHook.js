@@ -114,7 +114,11 @@
             return;
         }
         var changes = {};
-        changes[event.key] = {newValue: event.newValue};
+        if (event.key) {
+            changes[event.key] = {newValue: event.newValue};
+        } else {
+            changes = "clear";
+        }
         port.postMessage({change: true, type: type, changes: changes});
     });
     port.onDisconnect.addListener(function () {
