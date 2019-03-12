@@ -1,3 +1,4 @@
+console.timeEnd('total')
 angular.module("storageExplorer", []).
     value("extension", chrome.extension)
     .value("runtime", chrome.runtime)
