@@ -1,0 +1,30 @@
+button,html{
+	filter:invert(100%);
+}
+.btn-default{
+    color:#fff!important;
+    background-color:#333!important;
+    border-color:#333!important;
+}
+html{
+	background:#202020!important;
+}
+.nav-tabs>li.active>a,.table-striped>tbody>tr:nth-child(odd),.form-control,.dropdown-menu{
+    background-color:#eaeaea!important;
+}
+.table-striped>tbody>tr>td{
+	background-color:transparent!important;
+}
+.table-striped>tbody>tr:hover {
+    background-color:#cccccc!important;
+}
+.nav-tabs>li.active>a,.nav-tabs{
+	border-color:#bbb!important;
+}
+.nav-tabs>li.active>a{
+	background-color:#dfdfdf!important;
+    border-bottom:none!important;
+}
+.nav-tabs>li>a{
+	color:#bb5500;
+}
