@@ -11,6 +11,8 @@ Chrome Developer Tools extension which allows to:
 
 Currently, extension was removed from Chrome Store by Google, since they don't like `tabs` permission on extension.
 Easiest way to use (until I fix the issue and is back in Chrome store) is to download source and load this as an unpacked extension
+
+
 ~~Install from latest stable 0.4.2 version from [Chrome Store](https://chrome.google.com/webstore/detail/storage-area-explorer/ocfjjjjhkpapocigimmppepjgfdecjkb)~~
 
 
