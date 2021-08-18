@@ -8,12 +8,7 @@ Chrome Developer Tools extension which allows to:
    * export storage contents as JSON into clipboard or file
    * import storage contents from clipboard or file
 
-
-Currently, extension was removed from Chrome Store by Google, since they don't like `tabs` permission on extension.
-Easiest way to use (until I fix the issue and is back in Chrome store) is to download source and load this as an unpacked extension
-
-
-~~Install from latest stable 0.4.2 version from [Chrome Store](https://chrome.google.com/webstore/detail/storage-area-explorer/ocfjjjjhkpapocigimmppepjgfdecjkb)~~
+Install from latest stable 0.4.3 version from [Chrome Store](https://chrome.google.com/webstore/detail/storage-area-explorer/ocfjjjjhkpapocigimmppepjgfdecjkb)~~
 
 
 
